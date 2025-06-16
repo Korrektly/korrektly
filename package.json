@@ -1,0 +1,21 @@
+{
+    "name": "korrektly",
+    "private": true,
+    "scripts": {
+        "build": "turbo run build",
+        "dev": "turbo run dev",
+        "lint": "biome lint --write",
+        "format": "biome format --write",
+        "check": "biome check --write",
+        "check-types": "turbo run check-types"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "1.9.4",
+        "turbo": "^2.5.4"
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "packageManager": "bun@1.2.16",
+    "workspaces": ["apps/*", "packages/*"]
+}
