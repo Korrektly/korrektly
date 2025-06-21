@@ -1,0 +1,70 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\App;
+use App\Models\User;
+use Illuminate\Auth\Access\Response;
+
+class AppPolicy
+{
+    /**
+     * Determine whether the user can view any models.
+     */
+    public function viewAny(User $user): bool
+    {
+        // Users can view apps if they have a current workspace
+        return $user->current_workspace_id !== null;
+    }
+
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(User $user, App $app): bool
+    {
+        return $user->isMemberOfWorkspace($app->workspace_id);
+    }
+
+    /**
+     * Determine whether the user can create models.
+     */
+    public function create(User $user): bool
+    {
+        // Users can create apps if they have a current workspace and can manage it
+        return $user->current_workspace_id && $user->canManageWorkspace($user->current_workspace_id);
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(User $user, App $app): bool
+    {
+        return $user->canManageWorkspace($app->workspace_id);
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, App $app): bool
+    {
+        return $user->canManageWorkspace($app->workspace_id);
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user, App $app): bool
+    {
+        return $user->canManageWorkspace($app->workspace_id);
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(User $user, App $app): bool
+    {
+        // Only workspace owners can force delete
+        $membership = $user->getMembershipForWorkspace($app->workspace_id);
+        return $membership && $membership->isOwner();
+    }
+}

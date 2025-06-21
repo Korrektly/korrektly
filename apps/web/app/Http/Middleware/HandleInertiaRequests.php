@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -46,11 +47,47 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'ziggy' => fn (): array => [
+            'ziggy' => fn(): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'workspaces' => $this->getUserWorkspacesData($request->user()),
+        ];
+    }
+
+    private function getUserWorkspacesData(?User $user): array
+    {
+        if (! $user) {
+            return [[], null];
+        }
+
+        $memberships = $user->workspaceMemberships()
+            ->with('workspace')
+            ->get();
+
+        $workspaces = $memberships->map(fn($membership) => [
+            'id' => $membership->workspace->id,
+            'name' => $membership->workspace->name,
+            'role' => $membership->role,
+            'logo' => $membership->workspace->logo,
+        ])->toArray();
+
+        $currentWorkspace = null;
+        if ($user->currentWorkspace) {
+            $currentMembership = $memberships->firstWhere('workspace_id', $user->currentWorkspace->id);
+
+            $currentWorkspace = [
+                'id' => $user->currentWorkspace->id,
+                'name' => $user->currentWorkspace->name,
+                'role' => $currentMembership ? $currentMembership->role : null,
+                'logo' => $user->currentWorkspace->logo,
+            ];
+        }
+
+        return [
+            'enabled' => config('workspace.enabled'),
+            'all' => $workspaces,
+            'current' => $currentWorkspace,
         ];
     }
 }
