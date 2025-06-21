@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Installation;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class InstallationPolicy
 {
@@ -14,7 +13,7 @@ class InstallationPolicy
     public function viewAny(User $user): bool
     {
         // Users can view installations if they have a current workspace
-        return $user->current_workspace_id !== null;
+        return true;
     }
 
     /**
@@ -34,7 +33,7 @@ class InstallationPolicy
     public function create(User $user): bool
     {
         // All workspace members can create installations
-        return $user->current_workspace_id && $user->isMemberOfWorkspace($user->current_workspace_id);
+        return $user->current_workspace_id && $user->hasSomePermissions(['*'], $user->current_workspace_id);
     }
 
     /**
@@ -45,7 +44,7 @@ class InstallationPolicy
         // Load the app relationship to check workspace
         $installation->load('app');
 
-        return $installation->app && $user->canManageWorkspace($installation->app->workspace_id);
+        return $installation->app && $user->hasSomePermissions(['*'], $user->current_workspace_id);
     }
 
     /**
@@ -56,34 +55,6 @@ class InstallationPolicy
         // Load the app relationship to check workspace
         $installation->load('app');
 
-        return $installation->app && $user->canManageWorkspace($installation->app->workspace_id);
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Installation $installation): bool
-    {
-        // Load the app relationship to check workspace
-        $installation->load('app');
-
-        return $installation->app && $user->canManageWorkspace($installation->app->workspace_id);
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Installation $installation): bool
-    {
-        // Load the app relationship to check workspace
-        $installation->load('app');
-
-        if (!$installation->app) {
-            return false;
-        }
-
-        // Only workspace owners can force delete
-        $membership = $user->getMembershipForWorkspace($installation->app->workspace_id);
-        return $membership && $membership->isOwner();
+        return $installation->app && $user->hasSomePermissions(['*'], $user->current_workspace_id);
     }
 }

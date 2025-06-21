@@ -18,6 +18,7 @@ class WorkspaceMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check()) {
+            /** @var \App\Models\User $user */
             $user = Auth::user();
 
             // Check if we're switching workspaces

@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\App;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class AppPolicy
 {
@@ -14,15 +13,15 @@ class AppPolicy
     public function viewAny(User $user): bool
     {
         // Users can view apps if they have a current workspace
-        return $user->current_workspace_id !== null;
+        return true;
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, App $app): bool
+    public function view(User $user): bool
     {
-        return $user->isMemberOfWorkspace($app->workspace_id);
+        return $user->isMemberOfWorkspace($user->current_workspace_id);
     }
 
     /**
@@ -31,7 +30,7 @@ class AppPolicy
     public function create(User $user): bool
     {
         // Users can create apps if they have a current workspace and can manage it
-        return $user->current_workspace_id && $user->canManageWorkspace($user->current_workspace_id);
+        return $user->current_workspace_id && $user->hasSomePermissions(['*'], $user->current_workspace_id);
     }
 
     /**
@@ -39,7 +38,7 @@ class AppPolicy
      */
     public function update(User $user, App $app): bool
     {
-        return $user->canManageWorkspace($app->workspace_id);
+        return $user->hasSomePermissions(['*'], $user->current_workspace_id);
     }
 
     /**
@@ -47,24 +46,6 @@ class AppPolicy
      */
     public function delete(User $user, App $app): bool
     {
-        return $user->canManageWorkspace($app->workspace_id);
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, App $app): bool
-    {
-        return $user->canManageWorkspace($app->workspace_id);
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, App $app): bool
-    {
-        // Only workspace owners can force delete
-        $membership = $user->getMembershipForWorkspace($app->workspace_id);
-        return $membership && $membership->isOwner();
+        return $user->hasSomePermissions(['*'], $user->current_workspace_id);
     }
 }

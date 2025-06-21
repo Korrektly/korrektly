@@ -1,9 +1,7 @@
-import { ChartContainer } from "@/components/ui/chart";
-import { PlaceholderPattern } from "@/components/ui/placeholder-pattern";
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from "@/types";
 import { Head } from "@inertiajs/react";
-import { LineChart } from "recharts";
+import InstallationDashboard from "@/components/dashboard/installation-dashboard";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,23 +15,7 @@ export default function Dashboard() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-                <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                    <ChartContainer config={{}}>
-                        <LineChart
-                            data={[
-                                {
-                                    name: "Page A",
-                                    uv: 4000,
-                                    pv: 2400,
-                                    amt: 2400,
-                                },
-                            ]}
-                        />
-                    </ChartContainer>
-                </div>
-                <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                </div>
+                <InstallationDashboard />
             </div>
         </AppLayout>
     );

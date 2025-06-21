@@ -99,12 +99,16 @@ class InstallationController extends Controller
 
         $installations = $query->with('app')->orderBy('created_at', 'desc')->get();
 
+        // Calculate growth metrics
+        $growth = $this->calculatePeriodGrowth($installations, $payload, $timezone, $request);
+
         return response()->json([
             'installations' => $installations,
             'meta' => [
                 'total_count' => $installations->count(),
                 'timezone' => $timezone,
             ],
+            'growth' => $growth,
         ]);
     }
 
@@ -143,57 +147,232 @@ class InstallationController extends Controller
             $query->where('app_id', $payload['app_id']);
         }
 
-        // Group by the specified time period
-        switch ($groupBy) {
-            case 'hour':
-                $dateFormat = "DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '{$timezone}'), '%Y-%m-%d %H:00:00')";
-                break;
-            case 'week':
-                $dateFormat = "DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '{$timezone}'), '%Y-%u')";
-                break;
-            case 'month':
-                $dateFormat = "DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '{$timezone}'), '%Y-%m')";
-                break;
-            default: // day
-                $dateFormat = "DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '{$timezone}'), '%Y-%m-%d')";
+        // Get all installations and group them using PHP instead of database-specific functions
+        $installations = $query->with('app:id,name')->orderBy('created_at')->get();
+
+        // If no installations found, return empty aggregations
+        if ($installations->isEmpty()) {
+            return response()->json([
+                'aggregations' => [],
+                'meta' => [
+                    'start_date' => $startDate->setTimezone($timezone)->toDateTimeString(),
+                    'end_date' => $endDate->setTimezone($timezone)->toDateTimeString(),
+                    'timezone' => $timezone,
+                    'group_by' => $groupBy,
+                    'total_periods' => 0,
+                    'duration_days' => $startDate->diffInDays($endDate),
+                ],
+                'growth' => [
+                    'installations_growth' => 0,
+                    'active_users_growth' => 0,
+                    'period_over_period_growth' => 0,
+                ],
+            ]);
         }
 
-        $installations = $query
-            ->select(
-                DB::raw("{$dateFormat} as period"),
-                DB::raw('COUNT(*) as count'),
-                'app_id'
-            )
-            ->groupBy('period', 'app_id')
-            ->orderBy('period')
-            ->with('app:id,name')
-            ->get()
-            ->groupBy('period')
-            ->map(function ($group) {
-                return [
-                    'period' => $group->first()->period,
-                    'total_count' => $group->sum('count'),
-                    'apps' => $group->map(function ($item) {
-                        return [
-                            'app_id' => $item->app_id,
-                            'app_name' => $item->app->name ?? null,
-                            'count' => $item->count,
-                        ];
-                    })->values(),
+        // Group installations by time period using PHP
+        $groupedInstallations = [];
+        $activeUsersByPeriod = [];
+
+        foreach ($installations as $installation) {
+            $installationDate = Carbon::parse($installation->created_at)->setTimezone($timezone);
+
+            // Format date based on groupBy parameter
+            $period = match ($groupBy) {
+                'hour' => $installationDate->format('Y-m-d H:00:00'),
+                'week' => $installationDate->format('Y-W'),
+                'month' => $installationDate->format('Y-m'),
+                default => $installationDate->format('Y-m-d'), // day
+            };
+
+            if (!isset($groupedInstallations[$period])) {
+                $groupedInstallations[$period] = [];
+                $activeUsersByPeriod[$period] = 0;
+            }
+
+            if (!isset($groupedInstallations[$period][$installation->app_id])) {
+                $groupedInstallations[$period][$installation->app_id] = [
+                    'app_id' => $installation->app_id,
+                    'app_name' => $installation->app->name ?? null,
+                    'count' => 0
                 ];
-            })
-            ->values();
+            }
+
+            $groupedInstallations[$period][$installation->app_id]['count']++;
+
+            // Count active users (last seen within the period or recently)
+            $lastSeenDate = Carbon::parse($installation->last_seen_at)->setTimezone($timezone);
+            $periodStart = Carbon::parse($period)->setTimezone($timezone);
+            $periodEnd = match ($groupBy) {
+                'hour' => $periodStart->copy()->addHour(),
+                'week' => $periodStart->copy()->addWeek(),
+                'month' => $periodStart->copy()->addMonth(),
+                default => $periodStart->copy()->addDay(),
+            };
+
+            if ($lastSeenDate->between($periodStart, $periodEnd) || $lastSeenDate->diffInDays(now()) <= 7) {
+                $activeUsersByPeriod[$period]++;
+            }
+        }
+
+        // Convert to the expected format
+        $aggregations = [];
+        foreach ($groupedInstallations as $period => $apps) {
+            $totalCount = array_sum(array_column($apps, 'count'));
+            $aggregations[] = [
+                'period' => $period,
+                'total_count' => $totalCount,
+                'active_count' => $activeUsersByPeriod[$period] ?? 0,
+                'apps' => array_values($apps),
+            ];
+        }
+
+        // Sort by period
+        usort($aggregations, function ($a, $b) {
+            return strcmp($a['period'], $b['period']);
+        });
+
+        // Calculate growth metrics
+        $growth = $this->calculateAggregationGrowth($aggregations, $startDate, $endDate);
 
         return response()->json([
-            'aggregations' => $installations,
+            'aggregations' => $aggregations,
             'meta' => [
                 'start_date' => $startDate->setTimezone($timezone)->toDateTimeString(),
                 'end_date' => $endDate->setTimezone($timezone)->toDateTimeString(),
                 'timezone' => $timezone,
                 'group_by' => $groupBy,
-                'total_periods' => $installations->count(),
+                'total_periods' => count($aggregations),
+                'duration_days' => $startDate->diffInDays($endDate),
             ],
+            'growth' => $growth,
         ]);
+    }
+
+    private function calculatePeriodGrowth($installations, array $payload, string $timezone, Request $request)
+    {
+        if (!isset($payload['start_date']) || !isset($payload['end_date'])) {
+            return [
+                'installations_growth' => 0,
+                'active_users_growth' => 0,
+                'duration_days' => 0,
+            ];
+        }
+
+        $startDate = Carbon::parse($payload['start_date'])->setTimezone($timezone)->utc();
+        $endDate = Carbon::parse($payload['end_date'])->setTimezone($timezone)->utc();
+        $durationDays = $startDate->diffInDays($endDate);
+
+        // Get previous period data for comparison
+        $previousPeriodStart = $startDate->copy()->subDays($durationDays);
+        $previousPeriodEnd = $startDate->copy()->subDay();
+
+        $previousQuery = Installation::whereBetween('created_at', [$previousPeriodStart, $previousPeriodEnd]);
+        $previousQuery->whereHas('app', function ($q) use ($request) {
+            $q->where('workspace_id', $request->user()->current_workspace_id);
+        });
+
+        if (isset($payload['app_id'])) {
+            $previousQuery->where('app_id', $payload['app_id']);
+        }
+
+        $previousInstallations = $previousQuery->get();
+
+        // Calculate growth rates
+        $currentCount = $installations->count();
+        $previousCount = $previousInstallations->count();
+        $installationsGrowth = $previousCount > 0 ? (($currentCount - $previousCount) / $previousCount) * 100 : 0;
+
+        // Calculate active users growth
+        $currentActiveUsers = $installations->filter(function ($installation) {
+            return Carbon::parse($installation->last_seen_at)->diffInDays(now()) <= 7;
+        })->count();
+
+        $previousActiveUsers = $previousInstallations->filter(function ($installation) {
+            return Carbon::parse($installation->last_seen_at)->diffInDays(now()) <= 7;
+        })->count();
+
+        $activeUsersGrowth = $previousActiveUsers > 0 ? (($currentActiveUsers - $previousActiveUsers) / $previousActiveUsers) * 100 : 0;
+
+        return [
+            'installations_growth' => round($installationsGrowth, 2),
+            'active_users_growth' => round($activeUsersGrowth, 2),
+            'duration_days' => $durationDays,
+            'current_period' => [
+                'installations' => $currentCount,
+                'active_users' => $currentActiveUsers,
+            ],
+            'previous_period' => [
+                'installations' => $previousCount,
+                'active_users' => $previousActiveUsers,
+            ],
+        ];
+    }
+
+    private function calculateAggregationGrowth(array $aggregations, Carbon $startDate, Carbon $endDate)
+    {
+        if (count($aggregations) < 2) {
+            return [
+                'installations_growth' => 0,
+                'active_users_growth' => 0,
+                'period_over_period_growth' => 0,
+                'duration_days' => $startDate->diffInDays($endDate),
+            ];
+        }
+
+        // Calculate period-over-period growth (comparing last two periods)
+        $lastPeriod = end($aggregations);
+        $secondLastPeriod = $aggregations[count($aggregations) - 2];
+
+        $periodOverPeriodGrowth = $secondLastPeriod['total_count'] > 0
+            ? (($lastPeriod['total_count'] - $secondLastPeriod['total_count']) / $secondLastPeriod['total_count']) * 100
+            : 0;
+
+        // Calculate overall growth (first vs last period)
+        $firstPeriod = $aggregations[0];
+        $installationsGrowth = $firstPeriod['total_count'] > 0
+            ? (($lastPeriod['total_count'] - $firstPeriod['total_count']) / $firstPeriod['total_count']) * 100
+            : 0;
+
+        $activeUsersGrowth = $firstPeriod['active_count'] > 0
+            ? (($lastPeriod['active_count'] - $firstPeriod['active_count']) / $firstPeriod['active_count']) * 100
+            : 0;
+
+        return [
+            'installations_growth' => round($installationsGrowth, 2),
+            'active_users_growth' => round($activeUsersGrowth, 2),
+            'period_over_period_growth' => round($periodOverPeriodGrowth, 2),
+            'duration_days' => $startDate->diffInDays($endDate),
+            'total_periods' => count($aggregations),
+            'trend' => $this->calculateTrend($aggregations),
+        ];
+    }
+
+    private function calculateTrend(array $aggregations)
+    {
+        if (count($aggregations) < 3) {
+            return 'stable';
+        }
+
+        $values = array_column($aggregations, 'total_count');
+        $increases = 0;
+        $decreases = 0;
+
+        for ($i = 1; $i < count($values); $i++) {
+            if ($values[$i] > $values[$i - 1]) {
+                $increases++;
+            } elseif ($values[$i] < $values[$i - 1]) {
+                $decreases++;
+            }
+        }
+
+        if ($increases > $decreases) {
+            return 'increasing';
+        } elseif ($decreases > $increases) {
+            return 'decreasing';
+        }
+
+        return 'stable';
     }
 
     public function store(Request $request)

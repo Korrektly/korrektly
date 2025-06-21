@@ -96,10 +96,19 @@ class User extends Authenticatable
     /**
      * Check if user can manage resources in a workspace (owner or admin)
      */
-    public function canManageWorkspace(string $workspaceId): bool
+    public function hasSomePermissions(array $permissions, string $workspaceId): bool
     {
-        $membership = $this->getMembershipForWorkspace($workspaceId);
+        return $this->workspaceMemberships()
+            ->where('workspace_id', $workspaceId)
+            ->get()
+            ->some(fn($membership) => collect($permissions)->some(fn($permission) => in_array($permission, $membership->permissions)));
+    }
 
-        return $membership && ($membership->isOwner() || $membership->isAdmin());
+    public function hasAllPermissions(array $permissions, string $workspaceId): bool
+    {
+        return $this->workspaceMemberships()
+            ->where('workspace_id', $workspaceId)
+            ->get()
+            ->every(fn($membership) => collect($permissions)->every(fn($permission) => in_array($permission, $membership->permissions)));
     }
 }

@@ -33,6 +33,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = $request->user();
+
+        $user->current_workspace_id = $user->workspaceMemberships()->first()->workspace_id;
+        $user->save();
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
