@@ -33,7 +33,6 @@ export default function InstallationDashboard() {
     const [growth, setGrowth] = useState<GrowthMetrics>({
         installations_growth: 0,
         active_users_growth: 0,
-        duration_days: 0,
     });
 
     // Fetch apps for the dropdown
@@ -119,7 +118,6 @@ export default function InstallationDashboard() {
                 listResponse.data.growth || {
                     installations_growth: 0,
                     active_users_growth: 0,
-                    duration_days: 0,
                 },
             );
             setAggregations(aggregateResponse.data.aggregations);

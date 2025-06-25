@@ -102,6 +102,10 @@ class InstallationController extends Controller
         // Calculate growth metrics
         $growth = $this->calculatePeriodGrowth($installations, $payload, $timezone, $request);
 
+        // Calculate most adopted version
+        $mostAdoptedVersion = $this->calculateMostAdoptedVersion($installations);
+        $growth['most_adopted_version'] = $mostAdoptedVersion;
+
         return response()->json([
             'installations' => $installations,
             'meta' => [
@@ -160,7 +164,6 @@ class InstallationController extends Controller
                     'timezone' => $timezone,
                     'group_by' => $groupBy,
                     'total_periods' => 0,
-                    'duration_days' => $startDate->diffInDays($endDate),
                 ],
                 'growth' => [
                     'installations_growth' => 0,
@@ -243,7 +246,6 @@ class InstallationController extends Controller
                 'timezone' => $timezone,
                 'group_by' => $groupBy,
                 'total_periods' => count($aggregations),
-                'duration_days' => $startDate->diffInDays($endDate),
             ],
             'growth' => $growth,
         ]);
@@ -255,7 +257,6 @@ class InstallationController extends Controller
             return [
                 'installations_growth' => 0,
                 'active_users_growth' => 0,
-                'duration_days' => 0,
             ];
         }
 
@@ -297,7 +298,6 @@ class InstallationController extends Controller
         return [
             'installations_growth' => round($installationsGrowth, 2),
             'active_users_growth' => round($activeUsersGrowth, 2),
-            'duration_days' => $durationDays,
             'current_period' => [
                 'installations' => $currentCount,
                 'active_users' => $currentActiveUsers,
@@ -309,6 +309,38 @@ class InstallationController extends Controller
         ];
     }
 
+    private function calculateMostAdoptedVersion($installations)
+    {
+        if ($installations->isEmpty()) {
+            return null;
+        }
+
+        // Count versions, treating null/empty as "Unknown"
+        $versionCounts = [];
+        $totalCount = $installations->count();
+
+        foreach ($installations as $installation) {
+            $version = $installation->version ?: 'Unknown';
+            $versionCounts[$version] = ($versionCounts[$version] ?? 0) + 1;
+        }
+
+        if (empty($versionCounts)) {
+            return null;
+        }
+
+        // Find the most common version
+        arsort($versionCounts);
+        $mostCommonVersion = array_key_first($versionCounts);
+        $count = $versionCounts[$mostCommonVersion];
+        $percentage = round(($count / $totalCount) * 100, 1);
+
+        return [
+            'version' => $mostCommonVersion,
+            'count' => $count,
+            'percentage' => $percentage,
+        ];
+    }
+
     private function calculateAggregationGrowth(array $aggregations, Carbon $startDate, Carbon $endDate)
     {
         if (count($aggregations) < 2) {
@@ -316,7 +348,6 @@ class InstallationController extends Controller
                 'installations_growth' => 0,
                 'active_users_growth' => 0,
                 'period_over_period_growth' => 0,
-                'duration_days' => $startDate->diffInDays($endDate),
             ];
         }
 
@@ -342,7 +373,6 @@ class InstallationController extends Controller
             'installations_growth' => round($installationsGrowth, 2),
             'active_users_growth' => round($activeUsersGrowth, 2),
             'period_over_period_growth' => round($periodOverPeriodGrowth, 2),
-            'duration_days' => $startDate->diffInDays($endDate),
             'total_periods' => count($aggregations),
             'trend' => $this->calculateTrend($aggregations),
         ];
@@ -382,6 +412,7 @@ class InstallationController extends Controller
         $payload = $request->validate([
             'app_id' => 'required|exists:apps,id',
             'identifier' => 'required|string|max:255',
+            'version' => 'sometimes|string|max:255',
         ]);
 
         // Ensure the app belongs to user's workspace (if authenticated)
@@ -410,6 +441,7 @@ class InstallationController extends Controller
             'identifier' => $payload['identifier'],
         ], [
             'last_seen_at' => now(),
+            'version' => $payload['version'] ?? null,
         ]);
 
         RateLimiter::hit($key);

@@ -31,7 +31,11 @@ export interface AggregationData {
 export interface GrowthMetrics {
     installations_growth: number;
     active_users_growth: number;
-    duration_days: number;
+    most_adopted_version?: {
+        version: string;
+        count: number;
+        percentage: number;
+    };
     current_period?: {
         installations: number;
         active_users: number;

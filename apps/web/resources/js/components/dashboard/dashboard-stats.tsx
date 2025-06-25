@@ -1,4 +1,10 @@
-import { Activity, Download, Smartphone, TrendingUp } from "lucide-react";
+import {
+    Activity,
+    Download,
+    Smartphone,
+    TrendingUp,
+    Package,
+} from "lucide-react";
 import StatCard from "../stat-card";
 import { formatDateRangeText, getSelectedAppName } from "./utils";
 import type { App, GrowthMetrics } from "@/types/apps";
@@ -51,10 +57,7 @@ export default function DashboardStats({
     };
 
     const getGrowthDescription = () => {
-        const durationText =
-            growth.duration_days > 0
-                ? `vs ${growth.duration_days} days ago`
-                : `vs previous ${periodText}`;
+        const durationText = `vs previous ${periodText}`;
 
         if (growth.trend) {
             return `${appName} • ${durationText} • ${growth.trend}`;
@@ -95,18 +98,20 @@ export default function DashboardStats({
                 }
             />
             <StatCard
-                title={isAllApps ? "Total Apps" : "Duration"}
+                title={isAllApps ? "Total Apps" : "Most Adopted Version"}
                 value={
                     isAllApps
                         ? totalApps.toLocaleString()
-                        : `${growth.duration_days} days`
+                        : growth.most_adopted_version?.version || "Unknown"
                 }
                 description={
                     isAllApps
                         ? `across workspace • ${periodText}`
-                        : `${appName} • analysis period`
+                        : growth.most_adopted_version
+                          ? `${growth.most_adopted_version.count} installations (${growth.most_adopted_version.percentage}%)`
+                          : `${appName} • no version data`
                 }
-                icon={Smartphone}
+                icon={isAllApps ? Smartphone : Package}
             />
             <StatCard
                 title="Overall Growth"

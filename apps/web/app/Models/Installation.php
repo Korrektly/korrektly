@@ -14,6 +14,7 @@ class Installation extends Model
         'identifier',
         'app_id',
         'last_seen_at',
+        'version',
     ];
 
     public function app(): BelongsTo
