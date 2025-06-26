@@ -93,6 +93,7 @@ export interface SharedData {
         all: Workspace[];
         current: Workspace;
     };
+    apps: App[];
     [key: string]: unknown;
 }
 

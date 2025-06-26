@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Concerns\HasUuid;
+use App\Models\App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -26,5 +27,10 @@ class Workspace extends Model
     public function members(): HasMany
     {
         return $this->hasMany(WorkspaceMembership::class);
+    }
+
+    public function apps(): HasMany
+    {
+        return $this->hasMany(App::class);
     }
 }

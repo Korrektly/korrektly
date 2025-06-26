@@ -15,6 +15,7 @@ import { Link, usePage } from "@inertiajs/react";
 import { BookOpen, Folder, LayoutGrid } from "lucide-react";
 import AppLogo from "./app-logo";
 import { WorkspaceSelector } from "./workspace-selector";
+import { NavApps } from "./nav-apps";
 
 const mainNavItems: NavItem[] = [
     {
@@ -59,6 +60,8 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
+
+                <NavApps />
             </SidebarContent>
 
             <SidebarFooter>

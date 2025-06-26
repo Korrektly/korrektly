@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignUuid('app_id')->constrained('apps')->cascadeOnDelete();
             $table->timestamp('last_seen_at')->nullable();
             $table->string('version')->nullable();
+            $table->string('ip_address')->nullable();
             $table->timestamps();
         });
     }

@@ -407,26 +407,11 @@ class InstallationController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorize('create', Installation::class);
-
         $payload = $request->validate([
             'app_id' => 'required|exists:apps,id',
             'identifier' => 'required|string|max:255',
             'version' => 'sometimes|string|max:255',
         ]);
-
-        // Ensure the app belongs to user's workspace (if authenticated)
-        if ($request->user()) {
-            $app = App::where('id', $payload['app_id'])
-                ->where('workspace_id', $request->user()->current_workspace_id)
-                ->first();
-
-            if (!$app) {
-                return response()->json([
-                    'message' => 'App not found or does not belong to your workspace',
-                ], 404);
-            }
-        }
 
         $key = 'installations.' . $payload['app_id'] . '.' . $payload['identifier'];
 
@@ -442,6 +427,7 @@ class InstallationController extends Controller
         ], [
             'last_seen_at' => now(),
             'version' => $payload['version'] ?? null,
+            'ip_address' => $payload['ip_address'] ?? null,
         ]);
 
         RateLimiter::hit($key);

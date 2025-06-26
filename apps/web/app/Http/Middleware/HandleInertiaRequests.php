@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\App;
 use App\Models\User;
+use App\Models\Workspace;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -52,6 +54,7 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
             'workspaces' => $this->getUserWorkspacesData($request->user()),
+            'apps' => $this->getUserAppsData($request->user()),
         ];
     }
 
@@ -89,5 +92,20 @@ class HandleInertiaRequests extends Middleware
             'all' => $workspaces,
             'current' => $currentWorkspace,
         ];
+    }
+
+    private function getUserAppsData(?User $user): array
+    {
+        if (! $user || ! $user->currentWorkspace) {
+            return [];
+        }
+
+        $apps = App::where('workspace_id', $user->currentWorkspace->id)->get();
+
+        if (! $apps) {
+            return [];
+        }
+
+        return $apps->toArray();
     }
 }

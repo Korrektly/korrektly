@@ -7,7 +7,7 @@ use App\Http\Controllers\InstallationController;
 // Public API Routes (no authentication required)
 Route::group(['prefix' => 'api/v1'], function () {
     // Public installation endpoint for external app integrations
-    Route::post('installations', [InstallationController::class, 'store'])->name('api.installations.store.public');
+    Route::post('installations', [InstallationController::class, 'store'])->name('api.installations.store');
 });
 
 // Authenticated API Routes (for UI integration)
@@ -28,9 +28,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::group(['prefix' => 'installations'], function () {
             // Consolidated route for all installation queries (list, show, aggregate)
             Route::get('/', [InstallationController::class, 'index'])->name('api.installations.index');
-
-            // Create/update installation (authenticated)
-            Route::post('/', [InstallationController::class, 'store'])->name('api.installations.store');
         });
     });
 });
