@@ -412,7 +412,7 @@ class InstallationController extends Controller
             'version' => 'sometimes|string|max:255',
         ]);
 
-        $key = 'installations.'.$payload['app_id'].'.'.$payload['identifier'];
+        $key = 'installations.' . $payload['app_id'] . '.' . $payload['identifier'];
 
         if (RateLimiter::tooManyAttempts($key, 10)) {
             return response()->json([

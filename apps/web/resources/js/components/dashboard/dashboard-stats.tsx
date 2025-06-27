@@ -1,4 +1,10 @@
-import { Activity, Download, Smartphone, TrendingUp, Package } from "lucide-react";
+import {
+    Activity,
+    Download,
+    Smartphone,
+    TrendingUp,
+    Package,
+} from "lucide-react";
 import StatCard from "../stat-card";
 import { formatDateRangeText, getSelectedAppName } from "./utils";
 import type { App, GrowthMetrics } from "@/types/apps";
@@ -33,7 +39,10 @@ export default function DashboardStats({
         return (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="h-32 animate-pulse rounded-lg bg-muted" />
+                    <div
+                        key={i}
+                        className="h-32 animate-pulse rounded-lg bg-muted"
+                    />
                 ))}
             </div>
         );
@@ -60,6 +69,23 @@ export default function DashboardStats({
 
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <StatCard
+                title={isAllApps ? "Total Apps" : "Most Adopted Version"}
+                value={
+                    isAllApps
+                        ? totalApps.toLocaleString()
+                        : growth.most_adopted_version?.version || "Unknown"
+                }
+                description={
+                    isAllApps
+                        ? undefined
+                        : growth.most_adopted_version
+                          ? `${growth.most_adopted_version.count} installations (${growth.most_adopted_version.percentage}%)`
+                          : `${appName} • no version data`
+                }
+                icon={isAllApps ? Smartphone : Package}
+            />
+
             <StatCard
                 title="Total Installations"
                 value={totalInstallations.toLocaleString()}
@@ -88,18 +114,7 @@ export default function DashboardStats({
                         : undefined
                 }
             />
-            <StatCard
-                title={isAllApps ? "Total Apps" : "Most Adopted Version"}
-                value={isAllApps ? totalApps.toLocaleString() : growth.most_adopted_version?.version || "Unknown"}
-                description={
-                    isAllApps
-                        ? `across workspace • ${periodText}`
-                        : growth.most_adopted_version
-                          ? `${growth.most_adopted_version.count} installations (${growth.most_adopted_version.percentage}%)`
-                          : `${appName} • no version data`
-                }
-                icon={isAllApps ? Smartphone : Package}
-            />
+
             <StatCard
                 title="Overall Growth"
                 value={`${growthValue > 0 ? "+" : ""}${growthValue.toFixed(1)}%`}

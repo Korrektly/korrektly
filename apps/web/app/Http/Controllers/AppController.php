@@ -31,6 +31,15 @@ class AppController extends Controller
         ]);
     }
 
+    public function showDetails(App $app)
+    {
+        $this->authorize('view', $app);
+
+        return \Inertia\Inertia::render('apps/app', [
+            'app' => $app,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $this->authorize('create', App::class);
@@ -45,9 +54,7 @@ class AppController extends Controller
 
         $app = App::create($payload);
 
-        return response()->json([
-            'app' => $app,
-        ], 201);
+        return redirect()->route('apps.show', $app);
     }
 
     public function update(Request $request, App $app)

@@ -11,6 +11,7 @@ export interface Installation {
     id: number;
     app_id: number;
     identifier: string;
+    version?: string;
     last_seen_at: string;
     created_at: string;
     updated_at: string;
