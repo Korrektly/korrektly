@@ -84,7 +84,7 @@ class TestDataSeeder extends Seeder
         $this->command->info('Test data seeded successfully!');
         $this->command->info('User: test@example.com');
         $this->command->info('Password: password');
-        $this->command->info('Created ' . count($createdApps) . ' apps');
+        $this->command->info('Created '.count($createdApps).' apps');
         $this->command->info('Generated installations with various patterns');
     }
 
@@ -222,6 +222,7 @@ class TestDataSeeder extends Seeder
         if ($faker->boolean($activePercentage)) {
             $daysBack = $faker->numberBetween(1, 7);
             $startDate = max($installationDate->timestamp, $now->copy()->subDays($daysBack)->timestamp);
+
             return Carbon::createFromTimestamp($faker->numberBetween($startDate, $now->timestamp));
         }
 
@@ -230,6 +231,7 @@ class TestDataSeeder extends Seeder
             $daysBack = $faker->numberBetween(7, 30);
             $startDate = max($installationDate->timestamp, $now->copy()->subDays($daysBack)->timestamp);
             $endDate = max($startDate, $now->copy()->subDays(7)->timestamp);
+
             return Carbon::createFromTimestamp($faker->numberBetween($startDate, $endDate));
         }
 
@@ -237,6 +239,7 @@ class TestDataSeeder extends Seeder
         $maxDaysInactive = $faker->numberBetween(30, 60);
         $endDate = max($installationDate->timestamp, $now->copy()->subDays($maxDaysInactive)->timestamp);
         $maxEndDate = min($endDate, $installationDate->copy()->addDays(rand(1, 30))->timestamp);
+
         return Carbon::createFromTimestamp($faker->numberBetween($installationDate->timestamp, $maxEndDate));
     }
 }

@@ -38,7 +38,7 @@ class WorkspaceMembership extends Model
     // Accessors
     public function getPermissionsAttribute()
     {
-        return config('workspace.roles.' . strtolower($this->role) . '.permissions', []);
+        return config('workspace.roles.'.strtolower($this->role).'.permissions', []);
     }
 
     public function isOwner()
@@ -58,6 +58,6 @@ class WorkspaceMembership extends Model
 
     public function hasAnyPermissions(array $permissions)
     {
-        return collect($permissions)->some(fn($permission) => in_array($permission, $this->permissions));
+        return collect($permissions)->some(fn ($permission) => in_array($permission, $this->permissions));
     }
 }

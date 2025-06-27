@@ -13,11 +13,7 @@ interface CreateAppModalProps {
     onAppCreated: () => void;
 }
 
-export default function CreateAppModal({
-    open,
-    onOpenChange,
-    onAppCreated,
-}: CreateAppModalProps) {
+export default function CreateAppModal({ open, onOpenChange, onAppCreated }: CreateAppModalProps) {
     const [name, setName] = useState("");
     const [url, setUrl] = useState("");
     const [loading, setLoading] = useState(false);
@@ -61,9 +57,7 @@ export default function CreateAppModal({
             // Notify parent and close modal
             onAppCreated();
         } catch (error: unknown) {
-            const message =
-                (error as { response?: { data?: { message?: string } } })
-                    ?.response?.data?.message || "Failed to create app";
+            const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to create app";
 
             // Handle validation errors
             const errorResponse = error as {
@@ -107,33 +101,17 @@ export default function CreateAppModal({
             description="Add a new application to track installations and analytics."
             footer={
                 <div className="flex justify-end gap-2 w-full">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleClose}
-                        disabled={loading}
-                    >
+                    <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>
                         Cancel
                     </Button>
-                    <Button
-                        type="submit"
-                        form="create-app-form"
-                        disabled={loading}
-                        className="gap-2"
-                    >
-                        {loading && (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                        )}
+                    <Button type="submit" form="create-app-form" disabled={loading} className="gap-2">
+                        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                         Create App
                     </Button>
                 </div>
             }
         >
-            <form
-                id="create-app-form"
-                onSubmit={handleSubmit}
-                className="space-y-4"
-            >
+            <form id="create-app-form" onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="app-name">App Name *</Label>
                     <Input
@@ -144,11 +122,7 @@ export default function CreateAppModal({
                         disabled={loading}
                         className={errors.name ? "border-destructive" : ""}
                     />
-                    {errors.name && (
-                        <p className="text-sm text-destructive">
-                            {errors.name}
-                        </p>
-                    )}
+                    {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -161,9 +135,7 @@ export default function CreateAppModal({
                         disabled={loading}
                         className={errors.url ? "border-destructive" : ""}
                     />
-                    {errors.url && (
-                        <p className="text-sm text-destructive">{errors.url}</p>
-                    )}
+                    {errors.url && <p className="text-sm text-destructive">{errors.url}</p>}
                 </div>
             </form>
         </ResponsiveDialog>

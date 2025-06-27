@@ -3,14 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import axios from "axios";
 import { toast } from "sonner";
-import type {
-    App,
-    Installation,
-    AggregationData,
-    InstallationListResponse,
-    InstallationAggregateResponse,
-    GrowthMetrics,
-} from "@/types/apps";
+import type { App, Installation, AggregationData, InstallationListResponse, InstallationAggregateResponse, GrowthMetrics } from "@/types/apps";
 
 import DashboardHeader from "./dashboard-header";
 import DashboardStats from "./dashboard-stats";
@@ -41,9 +34,7 @@ export default function InstallationDashboard() {
             const response = await axios.get(route("api.apps.index"));
             setApps(response.data.apps);
         } catch (error: unknown) {
-            const message =
-                (error as { response?: { data?: { message?: string } } })
-                    ?.response?.data?.message || "Failed to fetch apps";
+            const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to fetch apps";
             toast.error(message);
         }
     };
@@ -104,12 +95,8 @@ export default function InstallationDashboard() {
             });
 
             const [listResponse, aggregateResponse] = await Promise.all([
-                axios.get<InstallationListResponse>(
-                    route("api.installations.index") + `?${listParams}`,
-                ),
-                axios.get<InstallationAggregateResponse>(
-                    route("api.installations.index") + `?${aggregateParams}`,
-                ),
+                axios.get<InstallationListResponse>(route("api.installations.index") + `?${listParams}`),
+                axios.get<InstallationAggregateResponse>(route("api.installations.index") + `?${aggregateParams}`),
             ]);
 
             setInstallations(listResponse.data.installations);
@@ -122,9 +109,7 @@ export default function InstallationDashboard() {
             );
             setAggregations(aggregateResponse.data.aggregations);
         } catch (error: unknown) {
-            const message =
-                (error as { response?: { data?: { message?: string } } })
-                    ?.response?.data?.message || "Failed to fetch statistics";
+            const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to fetch statistics";
             setError(message);
             toast.error(message);
         } finally {
@@ -151,9 +136,7 @@ export default function InstallationDashboard() {
     const getActiveInstallations = () => {
         const now = new Date();
         const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        return installations.filter(
-            (installation) => new Date(installation.last_seen_at) > oneDayAgo,
-        ).length;
+        return installations.filter((installation) => new Date(installation.last_seen_at) > oneDayAgo).length;
     };
 
     // Prepare chart data for the chart component
@@ -166,13 +149,7 @@ export default function InstallationDashboard() {
         }
 
         // Multi-app chart data - ensure consistent data points for all apps
-        const allAppIds = Array.from(
-            new Set(
-                aggregations.flatMap((data) =>
-                    data.apps.map((app) => app.app_id),
-                ),
-            ),
-        );
+        const allAppIds = Array.from(new Set(aggregations.flatMap((data) => data.apps.map((app) => app.app_id))));
 
         const chartData: ChartDataPoint[] = aggregations.map((data) => {
             const point: ChartDataPoint = {

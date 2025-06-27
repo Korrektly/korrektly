@@ -101,7 +101,7 @@ class User extends Authenticatable
         return $this->workspaceMemberships()
             ->where('workspace_id', $workspaceId)
             ->get()
-            ->some(fn($membership) => collect($permissions)->some(fn($permission) => in_array($permission, $membership->permissions)));
+            ->some(fn ($membership) => collect($permissions)->some(fn ($permission) => in_array($permission, $membership->permissions)));
     }
 
     public function hasAllPermissions(array $permissions, string $workspaceId): bool
@@ -109,6 +109,6 @@ class User extends Authenticatable
         return $this->workspaceMemberships()
             ->where('workspace_id', $workspaceId)
             ->get()
-            ->every(fn($membership) => collect($permissions)->every(fn($permission) => in_array($permission, $membership->permissions)));
+            ->every(fn ($membership) => collect($permissions)->every(fn ($permission) => in_array($permission, $membership->permissions)));
     }
 }

@@ -39,10 +39,7 @@ export function formatDateRangeText(dateRange: string): string {
 /**
  * Get the selected app name or "All Apps"
  */
-export function getSelectedAppName(
-    apps: Array<{ id: number; name: string }>,
-    selectedAppId: string,
-): string {
+export function getSelectedAppName(apps: Array<{ id: number; name: string }>, selectedAppId: string): string {
     if (selectedAppId === "all") {
         return "All Apps";
     }

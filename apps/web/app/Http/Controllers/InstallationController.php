@@ -4,11 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\App;
 use App\Models\Installation;
+use Carbon\Carbon;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class InstallationController extends Controller
 {
@@ -45,7 +44,7 @@ class InstallationController extends Controller
 
     private function showInstallation(array $payload, Request $request)
     {
-        if (!isset($payload['installation_id'])) {
+        if (! isset($payload['installation_id'])) {
             return response()->json([
                 'message' => 'installation_id is required when mode is show',
             ], 400);
@@ -53,7 +52,7 @@ class InstallationController extends Controller
 
         $installation = Installation::with('app')->find($payload['installation_id']);
 
-        if (!$installation) {
+        if (! $installation) {
             return response()->json([
                 'message' => 'Installation not found',
             ], 404);
@@ -81,7 +80,7 @@ class InstallationController extends Controller
                 ->where('workspace_id', $request->user()->current_workspace_id)
                 ->first();
 
-            if (!$app) {
+            if (! $app) {
                 return response()->json([
                     'message' => 'App not found or does not belong to your workspace',
                 ], 404);
@@ -118,7 +117,7 @@ class InstallationController extends Controller
 
     private function aggregateInstallations(array $payload, string $timezone, Request $request)
     {
-        if (!isset($payload['start_date']) || !isset($payload['end_date'])) {
+        if (! isset($payload['start_date']) || ! isset($payload['end_date'])) {
             return response()->json([
                 'message' => 'start_date and end_date are required when mode is aggregate',
             ], 400);
@@ -142,7 +141,7 @@ class InstallationController extends Controller
                 ->where('workspace_id', $request->user()->current_workspace_id)
                 ->first();
 
-            if (!$app) {
+            if (! $app) {
                 return response()->json([
                     'message' => 'App not found or does not belong to your workspace',
                 ], 404);
@@ -188,16 +187,16 @@ class InstallationController extends Controller
                 default => $installationDate->format('Y-m-d'), // day
             };
 
-            if (!isset($groupedInstallations[$period])) {
+            if (! isset($groupedInstallations[$period])) {
                 $groupedInstallations[$period] = [];
                 $activeUsersByPeriod[$period] = 0;
             }
 
-            if (!isset($groupedInstallations[$period][$installation->app_id])) {
+            if (! isset($groupedInstallations[$period][$installation->app_id])) {
                 $groupedInstallations[$period][$installation->app_id] = [
                     'app_id' => $installation->app_id,
                     'app_name' => $installation->app->name ?? null,
-                    'count' => 0
+                    'count' => 0,
                 ];
             }
 
@@ -253,7 +252,7 @@ class InstallationController extends Controller
 
     private function calculatePeriodGrowth($installations, array $payload, string $timezone, Request $request)
     {
-        if (!isset($payload['start_date']) || !isset($payload['end_date'])) {
+        if (! isset($payload['start_date']) || ! isset($payload['end_date'])) {
             return [
                 'installations_growth' => 0,
                 'active_users_growth' => 0,
@@ -413,7 +412,7 @@ class InstallationController extends Controller
             'version' => 'sometimes|string|max:255',
         ]);
 
-        $key = 'installations.' . $payload['app_id'] . '.' . $payload['identifier'];
+        $key = 'installations.'.$payload['app_id'].'.'.$payload['identifier'];
 
         if (RateLimiter::tooManyAttempts($key, 10)) {
             return response()->json([

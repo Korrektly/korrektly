@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use App\Models\App;
 use App\Models\User;
-use App\Models\Workspace;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -49,7 +48,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'ziggy' => fn(): array => [
+            'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
@@ -68,7 +67,7 @@ class HandleInertiaRequests extends Middleware
             ->with('workspace')
             ->get();
 
-        $workspaces = $memberships->map(fn($membership) => [
+        $workspaces = $memberships->map(fn ($membership) => [
             'id' => $membership->workspace->id,
             'name' => $membership->workspace->name,
             'role' => $membership->role,

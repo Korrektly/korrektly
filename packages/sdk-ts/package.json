@@ -1,28 +1,26 @@
 {
-  "name": "@korrektly/sdk",
-  "version": "1.0.0",
-  "description": "TypeScript SDK for Korrektly",
-  "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+    "name": "@korrektly/sdk",
+    "version": "1.0.0",
+    "description": "TypeScript SDK for Korrektly",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "require": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "files": ["dist"],
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc",
+        "test": "bun test",
+        "prepublish": "bun run build",
+        "publish": "bun run build && bun publish"
+    },
+    "devDependencies": {
+        "@types/bun": "latest"
     }
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "tsc",
-    "dev": "tsc",
-    "test": "bun test",
-    "prepublish": "bun run build",
-    "publish": "bun run build && bun publish"
-  },
-  "devDependencies": {
-    "@types/bun": "latest"
-  }
 }

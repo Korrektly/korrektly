@@ -29,7 +29,7 @@ class RegisteredEvent
         DB::transaction(function () use ($user) {
             $workspace = Workspace::create([
                 'name' => "{$user->name}'s Workspace",
-                'slug' => Str::slug("{$user->name} Workspace") . Str::random(5),
+                'slug' => Str::slug("{$user->name} Workspace").Str::random(5),
                 'owner_id' => $user->id,
             ]);
 

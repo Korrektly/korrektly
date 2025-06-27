@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\InstallationController;
+use Illuminate\Support\Facades\Route;
 
 // Public API Routes (no authentication required)
 Route::group(['prefix' => 'api/v1'], function () {

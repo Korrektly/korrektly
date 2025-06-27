@@ -1,22 +1,7 @@
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-} from "@/components/ui/chart";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import {
-    generateAppColor,
-    formatDateRangeText,
-    getSelectedAppName,
-} from "./utils";
+import { generateAppColor, formatDateRangeText, getSelectedAppName } from "./utils";
 import type { App } from "@/types/apps";
 
 interface ChartDataPoint {
@@ -32,13 +17,7 @@ interface DashboardChartProps {
     loading: boolean;
 }
 
-export default function DashboardChart({
-    apps,
-    selectedAppId,
-    dateRange,
-    chartData,
-    loading,
-}: DashboardChartProps) {
+export default function DashboardChart({ apps, selectedAppId, dateRange, chartData, loading }: DashboardChartProps) {
     const appName = getSelectedAppName(apps, selectedAppId);
     const periodText = formatDateRangeText(dateRange);
 
@@ -56,9 +35,7 @@ export default function DashboardChart({
             };
         });
     } else {
-        const selectedApp = apps.find(
-            (app) => app.id.toString() === selectedAppId,
-        );
+        const selectedApp = apps.find((app) => app.id.toString() === selectedAppId);
         if (selectedApp) {
             chartConfig[`app_${selectedApp.id}`] = {
                 label: selectedApp.name,
@@ -126,10 +103,7 @@ export default function DashboardChart({
             </CardHeader>
             <CardContent className="pt-6">
                 <div className="relative">
-                    <ChartContainer
-                        config={displayConfig}
-                        className={`h-[380px] w-full ${!hasData ? "opacity-30" : ""}`}
-                    >
+                    <ChartContainer config={displayConfig} className={`h-[380px] w-full ${!hasData ? "opacity-30" : ""}`}>
                         <AreaChart
                             accessibilityLayer
                             data={displayData}
@@ -141,84 +115,29 @@ export default function DashboardChart({
                             }}
                         >
                             <CartesianGrid vertical={false} />
-                            <XAxis
-                                dataKey="date"
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={8}
-                                tickFormatter={(value) => value.slice(5)}
-                            />
-                            <YAxis
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={8}
-                                domain={["auto", "auto"]}
-                            />
-                            <ChartTooltip
-                                cursor={false}
-                                content={
-                                    <ChartTooltipContent indicator="dot" />
-                                }
-                            />
+                            <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(5)} />
+                            <YAxis tickLine={false} axisLine={false} tickMargin={8} domain={["auto", "auto"]} />
+                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
 
                             {/* Generate gradient definitions */}
                             <defs>
                                 {isMultipleApps || !hasData ? (
                                     displayDataKeys.map((dataKey) => (
-                                        <linearGradient
-                                            key={dataKey}
-                                            id={`gradient-${dataKey}`}
-                                            x1="0"
-                                            y1="0"
-                                            x2="0"
-                                            y2="1"
-                                        >
-                                            <stop
-                                                offset="5%"
-                                                stopColor={
-                                                    displayConfig[dataKey]
-                                                        ?.color
-                                                }
-                                                stopOpacity={0.4}
-                                            />
-                                            <stop
-                                                offset="95%"
-                                                stopColor={
-                                                    displayConfig[dataKey]
-                                                        ?.color
-                                                }
-                                                stopOpacity={0.1}
-                                            />
+                                        <linearGradient key={dataKey} id={`gradient-${dataKey}`} x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor={displayConfig[dataKey]?.color} stopOpacity={0.4} />
+                                            <stop offset="95%" stopColor={displayConfig[dataKey]?.color} stopOpacity={0.1} />
                                         </linearGradient>
                                     ))
                                 ) : (
-                                    <linearGradient
-                                        id="gradient-single"
-                                        x1="0"
-                                        y1="0"
-                                        x2="0"
-                                        y2="1"
-                                    >
+                                    <linearGradient id="gradient-single" x1="0" y1="0" x2="0" y2="1">
                                         <stop
                                             offset="5%"
-                                            stopColor={
-                                                displayDataKeys[0]
-                                                    ? displayConfig[
-                                                          displayDataKeys[0]
-                                                      ]?.color
-                                                    : "#8884d8"
-                                            }
+                                            stopColor={displayDataKeys[0] ? displayConfig[displayDataKeys[0]]?.color : "#8884d8"}
                                             stopOpacity={0.3}
                                         />
                                         <stop
                                             offset="95%"
-                                            stopColor={
-                                                displayDataKeys[0]
-                                                    ? displayConfig[
-                                                          displayDataKeys[0]
-                                                      ]?.color
-                                                    : "#8884d8"
-                                            }
+                                            stopColor={displayDataKeys[0] ? displayConfig[displayDataKeys[0]]?.color : "#8884d8"}
                                             stopOpacity={0.05}
                                         />
                                     </linearGradient>
@@ -230,11 +149,7 @@ export default function DashboardChart({
                                     key={dataKey}
                                     dataKey={dataKey}
                                     type="natural"
-                                    fill={
-                                        isMultipleApps || !hasData
-                                            ? `url(#gradient-${dataKey})`
-                                            : "url(#gradient-single)"
-                                    }
+                                    fill={isMultipleApps || !hasData ? `url(#gradient-${dataKey})` : "url(#gradient-single)"}
                                     fillOpacity={1}
                                     stroke={displayConfig[dataKey]?.color}
                                     strokeWidth={2}
@@ -247,9 +162,7 @@ export default function DashboardChart({
                     {!hasData && (
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="text-center space-y-2">
-                                <h3 className="text-lg font-semibold text-muted-foreground">
-                                    No Installation Data
-                                </h3>
+                                <h3 className="text-lg font-semibold text-muted-foreground">No Installation Data</h3>
                                 <p className="text-sm text-muted-foreground max-w-sm">
                                     {apps.length === 0
                                         ? "Add an app to your workspace to start tracking installations"

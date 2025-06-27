@@ -1,15 +1,5 @@
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    useSidebar,
-} from "@/components/ui/sidebar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { SharedData } from "@/types";
 import { Link } from "@inertiajs/react";
 import { CheckIcon, ChevronsUpDown, Users } from "lucide-react";
@@ -35,10 +25,7 @@ export function WorkspaceSelector({
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton
-                            size="sm"
-                            className="ring-border bg-background rounded-lg ring-1 md:h-8"
-                        >
+                        <SidebarMenuButton size="sm" className="ring-border bg-background rounded-lg ring-1 md:h-8">
                             <div className="flex aspect-square size-4 items-center justify-center rounded-lg">
                                 {currentWorkspace?.logo ? (
                                     <img
@@ -51,10 +38,7 @@ export function WorkspaceSelector({
                                 )}
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-medium">
-                                    {currentWorkspace?.name ||
-                                        "Select a workspace"}
-                                </span>
+                                <span className="truncate font-medium">{currentWorkspace?.name || "Select a workspace"}</span>
                             </div>
                             <ChevronsUpDown className="ml-auto size-4" />
                         </SidebarMenuButton>
@@ -74,9 +58,7 @@ export function WorkspaceSelector({
                                     preserveScroll
                                 >
                                     <span>{workspace.name}</span>
-                                    {currentWorkspace?.id === workspace.id && (
-                                        <CheckIcon className="h-4 w-4" />
-                                    )}
+                                    {currentWorkspace?.id === workspace.id && <CheckIcon className="h-4 w-4" />}
                                 </Link>
                             </DropdownMenuItem>
                         ))}

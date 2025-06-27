@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\App;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 
 class AppController extends Controller
 {
