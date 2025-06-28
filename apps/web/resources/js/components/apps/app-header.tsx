@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ExternalLink } from "lucide-react";
 import type { App } from "@/types/apps";
 
@@ -15,11 +9,7 @@ interface AppHeaderProps {
     onDateRangeChange: (value: string) => void;
 }
 
-export default function AppHeader({
-    app,
-    dateRange,
-    onDateRangeChange,
-}: AppHeaderProps) {
+export default function AppHeader({ app, dateRange, onDateRangeChange }: AppHeaderProps) {
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleString(undefined, {
             year: "numeric",
@@ -35,24 +25,16 @@ export default function AppHeader({
         <div className="flex items-center justify-between">
             <div className="space-y-1">
                 <div className="flex items-center gap-3">
-                    <h1 className="text-3xl font-bold tracking-tight">
-                        {app.name}
-                    </h1>
+                    <h1 className="text-3xl font-bold tracking-tight">{app.name}</h1>
                     {app.url && (
                         <Button variant="outline" size="sm" asChild>
-                            <a
-                                href={app.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
+                            <a href={app.url} target="_blank" rel="noopener noreferrer">
                                 <ExternalLink className="size-4" />
                             </a>
                         </Button>
                     )}
                 </div>
-                <p className="text-muted-foreground">
-                    Created {formatDate(app.created_at)}
-                </p>
+                <p className="text-muted-foreground">Created {formatDate(app.created_at)}</p>
             </div>
 
             {/* Date Range Filter */}

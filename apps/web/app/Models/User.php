@@ -24,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'current_workspace_id',
     ];
 
     /**
@@ -76,8 +77,12 @@ class User extends Authenticatable
     /**
      * Check if user is a member of the given workspace
      */
-    public function isMemberOfWorkspace(string $workspaceId): bool
+    public function isMemberOfWorkspace(?string $workspaceId): bool
     {
+        if (! $workspaceId) {
+            return false;
+        }
+
         return $this->workspaceMemberships()
             ->where('workspace_id', $workspaceId)
             ->exists();
@@ -96,8 +101,12 @@ class User extends Authenticatable
     /**
      * Check if user can manage resources in a workspace (owner or admin)
      */
-    public function hasSomePermissions(array $permissions, string $workspaceId): bool
+    public function hasSomePermissions(array $permissions, ?string $workspaceId): bool
     {
+        if (! $workspaceId) {
+            return false;
+        }
+
         return $this->workspaceMemberships()
             ->where('workspace_id', $workspaceId)
             ->get()

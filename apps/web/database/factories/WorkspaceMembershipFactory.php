@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\User;
 use App\Models\Workspace;
-use App\Models\WorkspaceMembership;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -31,7 +30,7 @@ class WorkspaceMembershipFactory extends Factory
      */
     public function owner(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'role' => 'owner',
         ]);
     }
@@ -41,7 +40,7 @@ class WorkspaceMembershipFactory extends Factory
      */
     public function admin(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'role' => 'admin',
         ]);
     }
@@ -51,7 +50,7 @@ class WorkspaceMembershipFactory extends Factory
      */
     public function member(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'role' => 'member',
         ]);
     }
@@ -61,7 +60,7 @@ class WorkspaceMembershipFactory extends Factory
      */
     public function forWorkspaceAndUser(Workspace $workspace, User $user): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'workspace_id' => $workspace->id,
             'user_id' => $user->id,
         ]);
@@ -72,7 +71,7 @@ class WorkspaceMembershipFactory extends Factory
      */
     public function forWorkspace(Workspace $workspace): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'workspace_id' => $workspace->id,
         ]);
     }
@@ -82,7 +81,7 @@ class WorkspaceMembershipFactory extends Factory
      */
     public function forUser(User $user): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'user_id' => $user->id,
         ]);
     }

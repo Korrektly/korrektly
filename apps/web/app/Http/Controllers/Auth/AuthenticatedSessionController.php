@@ -35,8 +35,12 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
-        $user->current_workspace_id = $user->workspaceMemberships()->first()->workspace_id;
-        $user->save();
+        // Set current workspace to the first workspace membership if available
+        $firstMembership = $user->workspaceMemberships()->first();
+        if ($firstMembership) {
+            $user->current_workspace_id = $firstMembership->workspace_id;
+            $user->save();
+        }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }

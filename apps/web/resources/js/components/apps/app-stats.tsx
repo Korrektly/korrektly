@@ -12,24 +12,14 @@ interface AppStatsProps {
     loading: boolean;
 }
 
-export default function AppStats({
-    app,
-    dateRange,
-    totalInstallations,
-    activeInstallations,
-    growth,
-    loading,
-}: AppStatsProps) {
+export default function AppStats({ app, dateRange, totalInstallations, activeInstallations, growth, loading }: AppStatsProps) {
     const periodText = formatDateRangeText(dateRange);
 
     if (loading) {
         return (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {Array.from({ length: 4 }).map((_, i) => (
-                    <div
-                        key={i}
-                        className="h-32 animate-pulse rounded-lg bg-muted"
-                    />
+                    <div key={i} className="h-32 animate-pulse rounded-lg bg-muted" />
                 ))}
             </div>
         );
@@ -69,17 +59,11 @@ export default function AppStats({
 
             <StatCard
                 title="Growth Trend"
-                value={
-                    growth.trend
-                        ? growth.trend.charAt(0).toUpperCase() +
-                          growth.trend.slice(1)
-                        : "Stable"
-                }
+                value={growth.trend ? growth.trend.charAt(0).toUpperCase() + growth.trend.slice(1) : "Stable"}
                 description={`Period over period: ${growth.period_over_period_growth || 0}%`}
                 icon={TrendingUp}
                 trend={
-                    growth.period_over_period_growth !== undefined &&
-                    growth.period_over_period_growth !== 0
+                    growth.period_over_period_growth !== undefined && growth.period_over_period_growth !== 0
                         ? {
                               value: growth.period_over_period_growth,
                               isPositive: growth.period_over_period_growth >= 0,

@@ -1,16 +1,5 @@
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-} from "@/components/ui/chart";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { generateAppColor, formatDateRangeText } from "../dashboard/utils";
@@ -29,12 +18,7 @@ interface ChartDataPoint {
     active_installations: number;
 }
 
-export default function AppChart({
-    app,
-    dateRange,
-    aggregations,
-    loading,
-}: AppChartProps) {
+export default function AppChart({ app, dateRange, aggregations, loading }: AppChartProps) {
     const periodText = formatDateRangeText(dateRange);
 
     // Transform aggregation data to chart format
@@ -44,11 +28,7 @@ export default function AppChart({
         active_installations: data.active_count,
     }));
 
-    const hasData =
-        chartData.length > 0 &&
-        chartData.some(
-            (d) => d.installations > 0 || d.active_installations > 0,
-        );
+    const hasData = chartData.length > 0 && chartData.some((d) => d.installations > 0 || d.active_installations > 0);
 
     // Chart config for the app
     const chartConfig: ChartConfig = {
@@ -93,10 +73,7 @@ export default function AppChart({
             </CardHeader>
             <CardContent className="pt-6">
                 <div className="relative">
-                    <ChartContainer
-                        config={chartConfig}
-                        className={`h-[380px] w-full ${!hasData ? "opacity-30" : ""}`}
-                    >
+                    <ChartContainer config={chartConfig} className={`h-[380px] w-full ${!hasData ? "opacity-30" : ""}`}>
                         <AreaChart
                             accessibilityLayer
                             data={chartData}
@@ -108,72 +85,18 @@ export default function AppChart({
                             }}
                         >
                             <CartesianGrid vertical={false} />
-                            <XAxis
-                                dataKey="date"
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={8}
-                                tickFormatter={formatDateShort}
-                            />
-                            <YAxis
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={8}
-                                domain={["auto", "auto"]}
-                            />
-                            <ChartTooltip
-                                cursor={false}
-                                content={
-                                    <ChartTooltipContent indicator="dot" />
-                                }
-                            />
+                            <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={formatDateShort} />
+                            <YAxis tickLine={false} axisLine={false} tickMargin={8} domain={["auto", "auto"]} />
+                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
 
                             <defs>
-                                <linearGradient
-                                    id="fillInstallations"
-                                    x1="0"
-                                    y1="0"
-                                    x2="0"
-                                    y2="1"
-                                >
-                                    <stop
-                                        offset="5%"
-                                        stopColor={
-                                            chartConfig.installations.color
-                                        }
-                                        stopOpacity={0.8}
-                                    />
-                                    <stop
-                                        offset="95%"
-                                        stopColor={
-                                            chartConfig.installations.color
-                                        }
-                                        stopOpacity={0.1}
-                                    />
+                                <linearGradient id="fillInstallations" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor={chartConfig.installations.color} stopOpacity={0.8} />
+                                    <stop offset="95%" stopColor={chartConfig.installations.color} stopOpacity={0.1} />
                                 </linearGradient>
-                                <linearGradient
-                                    id="fillActiveInstallations"
-                                    x1="0"
-                                    y1="0"
-                                    x2="0"
-                                    y2="1"
-                                >
-                                    <stop
-                                        offset="5%"
-                                        stopColor={
-                                            chartConfig.active_installations
-                                                .color
-                                        }
-                                        stopOpacity={0.8}
-                                    />
-                                    <stop
-                                        offset="95%"
-                                        stopColor={
-                                            chartConfig.active_installations
-                                                .color
-                                        }
-                                        stopOpacity={0.1}
-                                    />
+                                <linearGradient id="fillActiveInstallations" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor={chartConfig.active_installations.color} stopOpacity={0.8} />
+                                    <stop offset="95%" stopColor={chartConfig.active_installations.color} stopOpacity={0.1} />
                                 </linearGradient>
                             </defs>
 
@@ -201,12 +124,9 @@ export default function AppChart({
                     {!hasData && (
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="text-center space-y-2">
-                                <h3 className="text-lg font-semibold text-muted-foreground">
-                                    No Installation Data
-                                </h3>
+                                <h3 className="text-lg font-semibold text-muted-foreground">No Installation Data</h3>
                                 <p className="text-sm text-muted-foreground max-w-sm">
-                                    Install or configure your app to see trends
-                                    and analytics here
+                                    Install or configure your app to see trends and analytics here
                                 </p>
                             </div>
                         </div>

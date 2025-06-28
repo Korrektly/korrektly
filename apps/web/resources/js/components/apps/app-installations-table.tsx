@@ -1,18 +1,5 @@
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Installation } from "@/types/apps";
@@ -22,10 +9,7 @@ interface AppInstallationsTableProps {
     loading: boolean;
 }
 
-export default function AppInstallationsTable({
-    installations,
-    loading,
-}: AppInstallationsTableProps) {
+export default function AppInstallationsTable({ installations, loading }: AppInstallationsTableProps) {
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleString(undefined, {
             year: "numeric",
@@ -59,16 +43,11 @@ export default function AppInstallationsTable({
         <Card>
             <CardHeader>
                 <CardTitle>Recent Installation Logs</CardTitle>
-                <CardDescription>
-                    Latest installations for this app ({installations.length}{" "}
-                    records)
-                </CardDescription>
+                <CardDescription>Latest installations for this app ({installations.length} records)</CardDescription>
             </CardHeader>
             <CardContent>
                 {installations.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                        No installations found for the selected period.
-                    </div>
+                    <div className="text-center py-8 text-muted-foreground">No installations found for the selected period.</div>
                 ) : (
                     <div className="rounded-md border">
                         <Table>
@@ -83,48 +62,19 @@ export default function AppInstallationsTable({
                             </TableHeader>
                             <TableBody>
                                 {installations.map((installation) => {
-                                    const lastSeen = new Date(
-                                        installation.last_seen_at,
-                                    );
-                                    const isActive =
-                                        lastSeen >
-                                        new Date(
-                                            Date.now() - 24 * 60 * 60 * 1000,
-                                        );
+                                    const lastSeen = new Date(installation.last_seen_at);
+                                    const isActive = lastSeen > new Date(Date.now() - 24 * 60 * 60 * 1000);
 
                                     return (
                                         <TableRow key={installation.id}>
-                                            <TableCell className="font-medium">
-                                                {installation.identifier}
-                                            </TableCell>
+                                            <TableCell className="font-medium">{installation.identifier}</TableCell>
                                             <TableCell>
-                                                <Badge variant="outline">
-                                                    {installation.version ||
-                                                        "Unknown"}
-                                                </Badge>
+                                                <Badge variant="outline">{installation.version || "Unknown"}</Badge>
                                             </TableCell>
+                                            <TableCell>{formatDate(installation.created_at)}</TableCell>
+                                            <TableCell>{formatDate(installation.last_seen_at)}</TableCell>
                                             <TableCell>
-                                                {formatDate(
-                                                    installation.created_at,
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatDate(
-                                                    installation.last_seen_at,
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge
-                                                    variant={
-                                                        isActive
-                                                            ? "default"
-                                                            : "secondary"
-                                                    }
-                                                >
-                                                    {isActive
-                                                        ? "Active"
-                                                        : "Inactive"}
-                                                </Badge>
+                                                <Badge variant={isActive ? "default" : "secondary"}>{isActive ? "Active" : "Inactive"}</Badge>
                                             </TableCell>
                                         </TableRow>
                                     );

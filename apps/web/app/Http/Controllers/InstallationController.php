@@ -19,8 +19,8 @@ class InstallationController extends Controller
 
         $payload = $request->validate([
             'mode' => 'sometimes|in:list,show,aggregate',
-            'app_id' => 'sometimes|exists:apps,id',
-            'installation_id' => 'sometimes|exists:installations,id',
+            'app_id' => 'sometimes|uuid',
+            'installation_id' => 'sometimes|uuid',
             'start_date' => 'sometimes|date',
             'end_date' => 'sometimes|date',
             'timezone' => 'sometimes|string',
@@ -265,7 +265,7 @@ class InstallationController extends Controller
 
         // Get previous period data for comparison
         $previousPeriodStart = $startDate->copy()->subDays($durationDays);
-        $previousPeriodEnd = $startDate->copy()->subDay();
+        $previousPeriodEnd = $startDate->copy();
 
         $previousQuery = Installation::whereBetween('created_at', [$previousPeriodStart, $previousPeriodEnd]);
         $previousQuery->whereHas('app', function ($q) use ($request) {
@@ -412,7 +412,7 @@ class InstallationController extends Controller
             'version' => 'sometimes|string|max:255',
         ]);
 
-        $key = 'installations.' . $payload['app_id'] . '.' . $payload['identifier'];
+        $key = 'installations.'.$payload['app_id'].'.'.$payload['identifier'];
 
         if (RateLimiter::tooManyAttempts($key, 10)) {
             return response()->json([

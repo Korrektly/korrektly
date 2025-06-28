@@ -19,9 +19,11 @@ class AppPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user): bool
+    public function view(User $user, App $app): bool
     {
-        return $user->isMemberOfWorkspace($user->current_workspace_id);
+        return $user->current_workspace_id &&
+            $user->isMemberOfWorkspace($user->current_workspace_id) &&
+            $app->workspace_id === $user->current_workspace_id;
     }
 
     /**
@@ -38,7 +40,9 @@ class AppPolicy
      */
     public function update(User $user, App $app): bool
     {
-        return $user->hasSomePermissions(['*'], $user->current_workspace_id);
+        return $user->current_workspace_id &&
+            $app->workspace_id === $user->current_workspace_id &&
+            $user->hasSomePermissions(['*'], $user->current_workspace_id);
     }
 
     /**
@@ -46,6 +50,8 @@ class AppPolicy
      */
     public function delete(User $user, App $app): bool
     {
-        return $user->hasSomePermissions(['*'], $user->current_workspace_id);
+        return $user->current_workspace_id &&
+            $app->workspace_id === $user->current_workspace_id &&
+            $user->hasSomePermissions(['*'], $user->current_workspace_id);
     }
 }

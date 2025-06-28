@@ -5,14 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import axios from "axios";
 import { toast } from "sonner";
-import type {
-    App,
-    Installation,
-    AggregationData,
-    InstallationListResponse,
-    InstallationAggregateResponse,
-    GrowthMetrics,
-} from "@/types/apps";
+import type { App, Installation, AggregationData, InstallationListResponse, InstallationAggregateResponse, GrowthMetrics } from "@/types/apps";
 import type { BreadcrumbItem } from "@/types";
 
 // Import the new modular components
@@ -96,12 +89,8 @@ export default function AppDetails({ app }: AppDetailsProps) {
             });
 
             const [listResponse, aggregateResponse] = await Promise.all([
-                axios.get<InstallationListResponse>(
-                    route("api.installations.index") + `?${listParams}`,
-                ),
-                axios.get<InstallationAggregateResponse>(
-                    route("api.installations.index") + `?${aggregateParams}`,
-                ),
+                axios.get<InstallationListResponse>(route("api.installations.index") + `?${listParams}`),
+                axios.get<InstallationAggregateResponse>(route("api.installations.index") + `?${aggregateParams}`),
             ]);
 
             setInstallations(listResponse.data.installations);
@@ -114,9 +103,7 @@ export default function AppDetails({ app }: AppDetailsProps) {
             );
             setAggregations(aggregateResponse.data.aggregations);
         } catch (error: unknown) {
-            const message =
-                (error as { response?: { data?: { message?: string } } })
-                    ?.response?.data?.message || "Failed to fetch app data";
+            const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to fetch app data";
             setError(message);
             toast.error(message);
         } finally {
@@ -131,9 +118,7 @@ export default function AppDetails({ app }: AppDetailsProps) {
     const getActiveInstallations = () => {
         const now = new Date();
         const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        return installations.filter(
-            (installation) => new Date(installation.last_seen_at) > oneDayAgo,
-        ).length;
+        return installations.filter((installation) => new Date(installation.last_seen_at) > oneDayAgo).length;
     };
 
     if (error) {
@@ -144,11 +129,7 @@ export default function AppDetails({ app }: AppDetailsProps) {
                     <Alert variant="destructive" className="mx-auto max-w-2xl">
                         <AlertDescription className="flex items-center justify-between">
                             <span>{error}</span>
-                            <Button
-                                onClick={fetchData}
-                                variant="outline"
-                                size="sm"
-                            >
+                            <Button onClick={fetchData} variant="outline" size="sm">
                                 Retry
                             </Button>
                         </AlertDescription>
@@ -163,11 +144,7 @@ export default function AppDetails({ app }: AppDetailsProps) {
             <Head title={`${app.name} - App Details`} />
             <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-8 py-6">
                 {/* App Header */}
-                <AppHeader
-                    app={app}
-                    dateRange={dateRange}
-                    onDateRangeChange={setDateRange}
-                />
+                <AppHeader app={app} dateRange={dateRange} onDateRangeChange={setDateRange} />
 
                 {/* App Statistics */}
                 <AppStats
@@ -180,18 +157,10 @@ export default function AppDetails({ app }: AppDetailsProps) {
                 />
 
                 {/* App Chart */}
-                <AppChart
-                    app={app}
-                    dateRange={dateRange}
-                    aggregations={aggregations}
-                    loading={loading}
-                />
+                <AppChart app={app} dateRange={dateRange} aggregations={aggregations} loading={loading} />
 
                 {/* Installation Logs Table */}
-                <AppInstallationsTable
-                    installations={installations}
-                    loading={loading}
-                />
+                <AppInstallationsTable installations={installations} loading={loading} />
             </div>
         </AppLayout>
     );

@@ -32,7 +32,7 @@ class AppFactory extends Factory
         ];
 
         return [
-            'name' => fake()->randomElement($appNames) . ' ' . fake()->word(),
+            'name' => fake()->randomElement($appNames).' '.fake()->word(),
             'logo' => fake()->imageUrl(100, 100, 'technics', true),
             'url' => fake()->url(),
             'type' => fake()->randomElement(['web', 'mobile', 'desktop', 'api']),
@@ -45,7 +45,7 @@ class AppFactory extends Factory
      */
     public function web(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'web',
             'url' => fake()->url(),
         ]);
@@ -56,7 +56,7 @@ class AppFactory extends Factory
      */
     public function mobile(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'mobile',
             'url' => null,
         ]);
@@ -67,9 +67,9 @@ class AppFactory extends Factory
      */
     public function api(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'api',
-            'url' => fake()->url() . '/api',
+            'url' => fake()->url().'/api',
         ]);
     }
 
@@ -78,7 +78,7 @@ class AppFactory extends Factory
      */
     public function desktop(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'desktop',
             'url' => null,
         ]);
@@ -89,7 +89,7 @@ class AppFactory extends Factory
      */
     public function forWorkspace(Workspace $workspace): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'workspace_id' => $workspace->id,
         ]);
     }

@@ -1,11 +1,4 @@
-import {
-    SidebarGroup,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuItem,
-    SidebarMenuButton,
-    useSidebar,
-} from "@/components/ui/sidebar";
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import { SharedData } from "@/types";
 import { Link, usePage } from "@inertiajs/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,12 +17,7 @@ export function NavApps() {
             <SidebarGroupLabel className="flex items-center justify-between">
                 <span>Applications</span>
 
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-4 hidden md:block"
-                    onClick={() => setCreateOpen(true)}
-                >
+                <Button variant="ghost" size="icon" className="size-4 hidden md:block" onClick={() => setCreateOpen(true)}>
                     <PlusIcon />
                 </Button>
             </SidebarGroupLabel>
@@ -38,32 +26,19 @@ export function NavApps() {
                     apps.map((app) => (
                         <SidebarMenuItem key={app.id}>
                             <SidebarMenuButton tooltip={app.name}>
-                                <Link
-                                    href={route("apps.show", app.id)}
-                                    className="flex items-center gap-2"
-                                >
+                                <Link href={route("apps.show", app.id)} className="flex items-center gap-2">
                                     <Avatar className="size-4">
-                                        <AvatarImage
-                                            src={`https://www.google.com/s2/favicons?domain=${app.url}&sz=32`}
-                                        />
-                                        <AvatarFallback>
-                                            {app.name}
-                                        </AvatarFallback>
+                                        <AvatarImage src={`https://www.google.com/s2/favicons?domain=${app.url}&sz=32`} />
+                                        <AvatarFallback>{app.name}</AvatarFallback>
                                     </Avatar>
-                                    {sidebar.open && (
-                                        <span className="truncate">
-                                            {app.name}
-                                        </span>
-                                    )}
+                                    {sidebar.open && <span className="truncate">{app.name}</span>}
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ))
                 ) : (
                     <SidebarMenuItem>
-                        <span className="text-muted-foreground">
-                            No apps found
-                        </span>
+                        <span className="text-muted-foreground">No apps found</span>
                     </SidebarMenuItem>
                 )}
             </SidebarMenu>

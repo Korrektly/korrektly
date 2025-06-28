@@ -33,7 +33,7 @@ class InstallationFactory extends Factory
      */
     public function recentlyActive(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'last_seen_at' => fake()->dateTimeBetween('-1 hour', 'now'),
         ]);
     }
@@ -43,7 +43,7 @@ class InstallationFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'last_seen_at' => fake()->dateTimeBetween('-6 months', '-1 month'),
         ]);
     }
@@ -53,7 +53,7 @@ class InstallationFactory extends Factory
      */
     public function forApp(App $app): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'app_id' => $app->id,
         ]);
     }
@@ -63,7 +63,7 @@ class InstallationFactory extends Factory
      */
     public function withVersion(string $version): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'version' => $version,
         ]);
     }
@@ -73,7 +73,7 @@ class InstallationFactory extends Factory
      */
     public function withIPv6(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'ip_address' => fake()->ipv6(),
         ]);
     }

@@ -14,14 +14,7 @@ interface StatCardProps {
     className?: string;
 }
 
-export default function StatCard({
-    title,
-    value,
-    description,
-    icon: Icon,
-    trend,
-    className,
-}: StatCardProps) {
+export default function StatCard({ title, value, description, icon: Icon, trend, className }: StatCardProps) {
     return (
         <Card className={cn("", className)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -32,20 +25,9 @@ export default function StatCard({
                 <div className="text-2xl font-bold">{value}</div>
                 {(description || trend) && (
                     <div className="flex items-center gap-2">
-                        {description && (
-                            <p className="text-xs text-muted-foreground">
-                                {description}
-                            </p>
-                        )}
+                        {description && <p className="text-xs text-muted-foreground">{description}</p>}
                         {trend && (
-                            <span
-                                className={cn(
-                                    "text-xs font-medium",
-                                    trend.isPositive
-                                        ? "text-green-600"
-                                        : "text-red-600",
-                                )}
-                            >
+                            <span className={cn("text-xs font-medium", trend.isPositive ? "text-green-600" : "text-red-600")}>
                                 {trend.isPositive ? "+" : ""}
                                 {trend.value}%
                             </span>

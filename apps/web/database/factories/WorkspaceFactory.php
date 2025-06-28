@@ -23,7 +23,7 @@ class WorkspaceFactory extends Factory
 
         return [
             'name' => $name,
-            'slug' => Str::slug($name) . '-' . fake()->randomNumber(4),
+            'slug' => Str::slug($name).'-'.fake()->randomNumber(4),
             'logo' => fake()->imageUrl(200, 200, 'business', true),
             'owner_id' => User::factory(),
             'timezone' => fake()->randomElement([
@@ -43,7 +43,7 @@ class WorkspaceFactory extends Factory
      */
     public function forOwner(User $owner): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'owner_id' => $owner->id,
         ]);
     }
@@ -53,9 +53,9 @@ class WorkspaceFactory extends Factory
      */
     public function withName(string $name): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'name' => $name,
-            'slug' => Str::slug($name) . '-' . fake()->randomNumber(4),
+            'slug' => Str::slug($name).'-'.fake()->randomNumber(4),
         ]);
     }
 }
