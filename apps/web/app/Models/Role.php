@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -22,6 +23,6 @@ class Role extends Model
 
     public function getPermissionsAttribute(): array
     {
-        return config('workspace.roles.'.strtolower($this->name).'.permissions', []);
+        return config('workspace.roles.' . strtolower($this->name) . '.permissions', []);
     }
 }

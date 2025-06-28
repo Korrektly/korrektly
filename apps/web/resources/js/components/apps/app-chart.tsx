@@ -54,11 +54,11 @@ export default function AppChart({
     const chartConfig: ChartConfig = {
         installations: {
             label: "Total Installations",
-            color: generateAppColor(app.name, app.url),
+            color: "oklch(62.3% 0.214 259.815)",
         },
         active_installations: {
             label: "Active Installations",
-            color: generateAppColor(app.name + "_active", app.url),
+            color: "oklch(72.3% 0.219 149.579)",
         },
     };
 

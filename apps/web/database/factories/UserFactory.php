@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Workspace;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -29,6 +30,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'current_workspace_id' => null, // Will be set when needed
         ];
     }
 
@@ -37,8 +39,28 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Create a user with a current workspace
+     */
+    public function withCurrentWorkspace(?Workspace $workspace = null): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'current_workspace_id' => $workspace?->id ?? Workspace::factory()->create()->id,
+        ]);
+    }
+
+    /**
+     * Create a user with no current workspace
+     */
+    public function withoutCurrentWorkspace(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'current_workspace_id' => null,
         ]);
     }
 }

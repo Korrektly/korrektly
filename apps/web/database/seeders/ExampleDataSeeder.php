@@ -11,7 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
-class TestDataSeeder extends Seeder
+class ExampleDataSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -30,51 +30,37 @@ class TestDataSeeder extends Seeder
             ]
         );
 
-        // Create a workspace for the test user
-        $workspace = Workspace::firstOrCreate([
-            'owner_id' => $user->id,
-            'name' => 'Test Workspace',
-            'slug' => 'test-workspace',
-            'timezone' => 'UTC',
-        ]);
+        // Create a workspace for the test user using factory
+        $workspace = Workspace::factory()
+            ->forOwner($user)
+            ->withName('Test Workspace')
+            ->create([
+                'slug' => 'test-workspace',
+                'timezone' => 'UTC',
+            ]);
 
-        // Create workspace membership
-        WorkspaceMembership::firstOrCreate([
-            'workspace_id' => $workspace->id,
-            'user_id' => $user->id,
-            'role' => 'owner',
-        ]);
+        // Create workspace membership using factory
+        WorkspaceMembership::factory()
+            ->forWorkspaceAndUser($workspace, $user)
+            ->owner()
+            ->create();
 
         // Set the user's current workspace
         $user->update(['current_workspace_id' => $workspace->id]);
 
-        // Generate random apps with faker
-        $appTypes = ['web', 'mobile', 'desktop', 'extension', 'api'];
+        // Generate random apps using factories
+        $appTypes = ['web', 'mobile', 'desktop', 'api'];
         $appCount = rand(5, 10);
-        $apps = [];
+        $createdApps = [];
 
         for ($i = 0; $i < $appCount; $i++) {
             $type = $faker->randomElement($appTypes);
-            $companyName = $faker->company();
-            $appName = $this->generateAppName($faker, $type, $companyName);
-            $url = $this->generateAppUrl($faker, $type, $companyName);
 
-            $apps[] = [
-                'name' => $appName,
-                'url' => $url,
-                'type' => $type,
-            ];
-        }
+            $app = App::factory()
+                ->forWorkspace($workspace)
+                ->{$type}()
+                ->create();
 
-        $createdApps = [];
-        foreach ($apps as $appData) {
-            $app = App::firstOrCreate([
-                'name' => $appData['name'],
-                'workspace_id' => $workspace->id,
-            ], [
-                'url' => $appData['url'],
-                'type' => $appData['type'],
-            ]);
             $createdApps[] = $app;
         }
 
@@ -86,56 +72,6 @@ class TestDataSeeder extends Seeder
         $this->command->info('Password: password');
         $this->command->info('Created '.count($createdApps).' apps');
         $this->command->info('Generated installations with various patterns');
-    }
-
-    private function generateAppName($faker, string $type, string $companyName): string
-    {
-        $baseNames = [
-            'web' => ['Dashboard', 'Portal', 'Hub', 'Console', 'Manager', 'Studio', 'Platform'],
-            'mobile' => ['App', 'Mobile', 'Go', 'Pocket', 'Express', 'Lite', 'Pro'],
-            'desktop' => ['Desktop', 'Client', 'Suite', 'Workstation', 'Pro', 'Studio'],
-            'extension' => ['Extension', 'Helper', 'Assistant', 'Tools', 'Companion'],
-            'api' => ['API', 'Service', 'Gateway', 'Connect', 'Bridge', 'Sync'],
-        ];
-
-        $baseName = $faker->randomElement($baseNames[$type] ?? ['App']);
-        $companyShort = explode(' ', $companyName)[0];
-
-        return match (rand(1, 3)) {
-            1 => "{$companyShort} {$baseName}",
-            2 => "{$baseName} by {$companyShort}",
-            3 => "{$companyShort}{$baseName}",
-        };
-    }
-
-    private function generateAppUrl($faker, string $type, string $companyName): ?string
-    {
-        $domain = strtolower(str_replace([' ', '.', ','], '', explode(' ', $companyName)[0]));
-
-        return match ($type) {
-            'web' => $faker->randomElement([
-                "https://{$domain}.com",
-                "https://app.{$domain}.com",
-                "https://dashboard.{$domain}.com",
-                "https://portal.{$domain}.com",
-            ]),
-            'mobile' => $faker->randomElement([
-                "https://apps.apple.com/app/{$domain}",
-                "https://play.google.com/store/apps/details?id=com.{$domain}.app",
-                null, // Some mobile apps might not have URLs
-            ]),
-            'desktop' => $faker->boolean(30) ? "https://{$domain}.com/download" : null,
-            'extension' => $faker->randomElement([
-                "https://chrome.google.com/webstore/detail/{$domain}",
-                "https://addons.mozilla.org/addon/{$domain}",
-            ]),
-            'api' => $faker->randomElement([
-                "https://api.{$domain}.com",
-                "https://{$domain}.com/api",
-                null,
-            ]),
-            default => null,
-        };
     }
 
     private function generateInstallations(array $apps): void
@@ -150,7 +86,6 @@ class TestDataSeeder extends Seeder
                 'web' => rand(100, 400),
                 'mobile' => rand(50, 300),
                 'desktop' => rand(20, 150),
-                'extension' => rand(10, 100),
                 'api' => rand(5, 50),
                 default => rand(20, 200),
             };
@@ -165,19 +100,17 @@ class TestDataSeeder extends Seeder
                 $daysAgo = $this->getRealisticDaysAgo($app->type, $faker);
                 $installationDate = $now->copy()->subDays($daysAgo);
 
-                // Create unique identifier
-                $identifier = $faker->unique()->bothify('##########-????-####-????-############');
-
                 // Generate last seen date (some installations are more active than others)
                 $lastSeenDate = $this->getLastSeenDate($installationDate, $faker);
 
-                Installation::create([
-                    'app_id' => $app->id,
-                    'identifier' => $identifier,
-                    'created_at' => $installationDate,
-                    'updated_at' => $installationDate,
-                    'last_seen_at' => $lastSeenDate,
-                ]);
+                // Use factory to create installation
+                Installation::factory()
+                    ->forApp($app)
+                    ->create([
+                        'created_at' => $installationDate,
+                        'updated_at' => $installationDate,
+                        'last_seen_at' => $lastSeenDate,
+                    ]);
             }
         }
     }
@@ -197,10 +130,6 @@ class TestDataSeeder extends Seeder
             'desktop' => $faker->biasedNumberBetween(0, 90, function ($x) {
                 // Desktop apps are more consistent over time
                 return 1 - ($x / 90);
-            }),
-            'extension' => $faker->biasedNumberBetween(0, 90, function ($x) use ($faker) {
-                // Extensions might be newer, mostly recent installations
-                return 1 - ($x / 90) ** $faker->randomFloat(1, 0.3, 0.8);
             }),
             'api' => $faker->biasedNumberBetween(0, 90, function ($x) use ($faker) {
                 // APIs might have more sporadic adoption
