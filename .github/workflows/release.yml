@@ -32,6 +32,11 @@ jobs:
       - name: Install Bun Dependencies
         run: bun install
 
+      - name: Setup NPM Authentication
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
+
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
