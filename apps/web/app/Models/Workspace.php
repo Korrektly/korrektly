@@ -19,6 +19,11 @@ class Workspace extends Model
         'owner_id',
     ];
 
+    public function getLogoAttribute($value)
+    {
+        return "https://api.dicebear.com/9.x/glass/svg?seed={$this->id}";
+    }
+
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
@@ -32,5 +37,10 @@ class Workspace extends Model
     public function apps(): HasMany
     {
         return $this->hasMany(App::class);
+    }
+
+    public function getAppInstallationsCountAttribute(): int
+    {
+        return $this->apps()->withCount('installations')->get()->sum('installations_count');
     }
 }

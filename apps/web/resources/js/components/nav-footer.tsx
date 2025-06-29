@@ -17,13 +17,13 @@ export function NavFooter({
                     {items.map((item) => (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
-                                asChild
                                 className="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100"
+                                href={item.href}
+                                target={item.href.startsWith("http") ? "_blank" : undefined}
+                                rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
                             >
-                                <a href={item.href} target="_blank" rel="noopener noreferrer">
-                                    {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
-                                    <span>{item.title}</span>
-                                </a>
+                                {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
+                                <span>{item.title}</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ))}

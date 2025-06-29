@@ -28,11 +28,7 @@ export function WorkspaceSelector({
                         <SidebarMenuButton size="sm" className="ring-border bg-background rounded-lg ring-1 md:h-8">
                             <div className="flex aspect-square size-4 items-center justify-center rounded-lg">
                                 {currentWorkspace?.logo ? (
-                                    <img
-                                        src={currentWorkspace.logo}
-                                        alt={currentWorkspace.name}
-                                        className="size-4 rounded-lg border-2 border-white"
-                                    />
+                                    <img src={currentWorkspace.logo} alt={currentWorkspace.name} className="size-4 rounded-lg border-2" />
                                 ) : (
                                     <Users className="size-4" />
                                 )}
@@ -57,7 +53,7 @@ export function WorkspaceSelector({
                                     className="flex w-full items-center justify-between"
                                     preserveScroll
                                 >
-                                    <span>{workspace.name}</span>
+                                    <span className="truncate">{workspace.name}</span>
                                     {currentWorkspace?.id === workspace.id && <CheckIcon className="h-4 w-4" />}
                                 </Link>
                             </DropdownMenuItem>

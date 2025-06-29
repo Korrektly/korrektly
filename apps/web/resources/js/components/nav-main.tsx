@@ -10,11 +10,14 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             <SidebarMenu>
                 {items.map((item) => (
                     <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild isActive={page.url.startsWith(item.href)} tooltip={{ children: item.title }}>
-                            <Link href={item.href} prefetch>
-                                {item.icon && <item.icon />}
-                                <span>{item.title}</span>
-                            </Link>
+                        <SidebarMenuButton
+                            isActive={page.url.startsWith(item.href)}
+                            tooltip={{ children: item.title }}
+                            href={item.href}
+                            prefetch={false}
+                        >
+                            {item.icon && <item.icon />}
+                            <span>{item.title}</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 ))}

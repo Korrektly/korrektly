@@ -1,10 +1,10 @@
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { SharedData } from "@/types";
 import { Link, usePage } from "@inertiajs/react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PlusIcon } from "lucide-react";
-import CreateAppModal from "./apps/create-app-modal";
 import { useState } from "react";
+import CreateAppModal from "./apps/create-app-modal";
 import { Button } from "./ui/button";
 
 export function NavApps() {
@@ -25,14 +25,12 @@ export function NavApps() {
                 {apps.length > 0 ? (
                     apps.map((app) => (
                         <SidebarMenuItem key={app.id}>
-                            <SidebarMenuButton tooltip={app.name}>
-                                <Link href={route("apps.show", app.id)} className="flex items-center gap-2">
-                                    <Avatar className="size-4">
-                                        <AvatarImage src={`https://www.google.com/s2/favicons?domain=${app.url}&sz=32`} />
-                                        <AvatarFallback>{app.name}</AvatarFallback>
-                                    </Avatar>
-                                    {sidebar.open && <span className="truncate">{app.name}</span>}
-                                </Link>
+                            <SidebarMenuButton tooltip={app.name} href={route("apps.show", app.id)}>
+                                <Avatar className="size-4">
+                                    <AvatarImage src={`https://www.google.com/s2/favicons?domain=${app.url}&sz=32`} />
+                                    <AvatarFallback>{app.name}</AvatarFallback>
+                                </Avatar>
+                                {sidebar.open && <span className="truncate">{app.name}</span>}
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ))

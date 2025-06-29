@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/tooltip"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
+import { Link } from "@inertiajs/react"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -496,12 +497,18 @@ function SidebarMenuButton({
   variant = "default",
   size = "default",
   tooltip,
+  href,
   className,
+  prefetch = true,
+  target,
   ...props
 }: React.ComponentProps<"button"> & {
   asChild?: boolean
   isActive?: boolean
   tooltip?: string | React.ComponentProps<typeof TooltipContent>
+  href?: string
+  prefetch?: boolean
+  target?: string
 } & VariantProps<typeof sidebarMenuButtonVariants>) {
   const Comp = asChild ? Slot : "button"
   const { isMobile, state } = useSidebar()
@@ -517,8 +524,10 @@ function SidebarMenuButton({
     />
   )
 
+  const content = href ? <Link href={href} prefetch={prefetch} target={target}>{button}</Link> : button
+
   if (!tooltip) {
-    return button
+    return content
   }
 
   if (typeof tooltip === "string") {
@@ -529,7 +538,7 @@ function SidebarMenuButton({
 
   return (
     <Tooltip>
-      <TooltipTrigger asChild>{button}</TooltipTrigger>
+      <TooltipTrigger asChild>{content}</TooltipTrigger>
       <TooltipContent
         side="right"
         align="center"
