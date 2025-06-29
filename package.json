@@ -7,7 +7,8 @@
         "lint": "biome lint --write",
         "format": "biome format --write",
         "check": "biome check --write",
-        "test": "turbo run test && cd apps/web && bun run test"
+        "test": "turbo run test && cd apps/web && bun run test",
+        "publish-packages": "turbo run build lint test && changeset version && changeset publish"
     },
     "devDependencies": {
         "@biomejs/biome": "1.9.4",
@@ -17,5 +18,8 @@
         "node": ">=18"
     },
     "packageManager": "bun@1.2.16",
-    "workspaces": ["apps/*", "packages/*"]
+    "workspaces": ["apps/*", "packages/*"],
+    "dependencies": {
+        "@changesets/cli": "^2.29.5"
+    }
 }

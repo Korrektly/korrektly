@@ -5,9 +5,7 @@
       "name": "@korrektly/sdk-ts",
       "devDependencies": {
         "@types/bun": "latest",
-      },
-      "peerDependencies": {
-        "typescript": "^5",
+        "typescript": "latest",
       },
     },
   },
