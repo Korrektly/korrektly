@@ -8,7 +8,7 @@
         "format": "biome format --write",
         "check": "biome check --write",
         "test": "turbo run test",
-        "publish-packages": "turbo run build lint test --filter=packages/sdk-ts && changeset version && changeset publish"
+        "publish-packages": "turbo run build lint test --filter=@korrektly/sdk && changeset version && changeset publish"
     },
     "devDependencies": {
         "@biomejs/biome": "1.9.4",
