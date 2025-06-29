@@ -7,7 +7,7 @@
         "lint": "biome lint --write",
         "format": "biome format --write",
         "check": "biome check --write",
-        "check-types": "turbo run check-types"
+        "test": "turbo run test && cd apps/web && bun run test"
     },
     "devDependencies": {
         "@biomejs/biome": "1.9.4",

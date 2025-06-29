@@ -1,0 +1,57 @@
+name: Laravel Tests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/web/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'apps/web/**'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+          coverage: xdebug
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Bun Dependencies
+        working-directory: apps/web
+        run: bun install
+
+      - name: Build Assets
+        working-directory: apps/web
+        run: bun run build
+
+      - name: Install PHP Dependencies
+        working-directory: apps/web
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Copy Environment File
+        working-directory: apps/web
+        run: cp .env.example .env
+
+      - name: Generate Application Key
+        working-directory: apps/web
+        run: php artisan key:generate
+
+      - name: Tests
+        working-directory: apps/web
+        run: bun run test
