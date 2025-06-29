@@ -32,25 +32,6 @@ jobs:
       - name: Install Bun Dependencies
         run: bun install
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.4
-          tools: composer:v2
-          coverage: xdebug
-
-      - name: Install PHP Dependencies
-        working-directory: apps/web
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
-
-      - name: Copy Environment File
-        working-directory: apps/web
-        run: cp .env.example .env
-
-      - name: Generate Application Key
-        working-directory: apps/web
-        run: php artisan key:generate
-
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
