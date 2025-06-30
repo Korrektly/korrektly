@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\WorkspaceInvitationController;
 use App\Models\User;
+use App\Services\WorkspaceInvitationService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,10 +52,10 @@ class RegisteredUserController extends Controller
         // Handle workspace invitation if present
         $invitationToken = $request->input('invitation');
         if ($invitationToken) {
-            $invitationController = new WorkspaceInvitationController;
-            $accepted = $invitationController->acceptInvitationByToken($invitationToken, $user);
+            $invitationService = app(WorkspaceInvitationService::class);
+            $result = $invitationService->acceptInvitationByToken($invitationToken, $user);
 
-            if ($accepted) {
+            if ($result->wasSuccessful()) {
                 return redirect()->intended(route('dashboard', absolute: false))
                     ->with('success', 'Welcome! You have successfully joined the workspace.');
             } else {

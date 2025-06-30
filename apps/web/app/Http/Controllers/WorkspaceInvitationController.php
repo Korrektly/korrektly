@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Workspace;
 use App\Models\WorkspaceInvitation;
-use App\Models\WorkspaceMembership;
+use App\Services\WorkspaceInvitationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -61,40 +60,18 @@ class WorkspaceInvitationController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // Check if the invitation email matches the logged-in user
-        if ($user->email !== $invitation->email) {
-            return redirect()->route('home')->withErrors([
-                'error' => 'This invitation is for a different email address. Please log out and try again.',
-            ]);
+        $invitationService = app(WorkspaceInvitationService::class);
+        $result = $invitationService->acceptInvitationForAuthenticatedUser($invitation, $user);
+
+        if ($result->wasSuccessful()) {
+            return redirect()->route('dashboard')->with('success', $result->getMessage());
         }
 
-        // Check if user is already a member
-        $existingMembership = WorkspaceMembership::where('workspace_id', $invitation->workspace_id)
-            ->where('user_id', $user->id)
-            ->exists();
-
-        if ($existingMembership) {
-            return redirect()->route('dashboard')->withErrors([
-                'error' => 'You are already a member of this workspace.',
-            ]);
+        if ($result->getFlashType() === 'warning') {
+            return redirect()->route('dashboard')->with('warning', $result->getMessage());
         }
 
-        // Create membership
-        WorkspaceMembership::create([
-            'workspace_id' => $invitation->workspace_id,
-            'user_id' => $user->id,
-            'role' => $invitation->role,
-        ]);
-
-        // Set as current workspace if user doesn't have one
-        if (! $user->current_workspace_id) {
-            $user->update(['current_workspace_id' => $invitation->workspace_id]);
-        }
-
-        // Mark invitation as accepted
-        $invitation->markAsAccepted();
-
-        return redirect()->route('dashboard')->with('success', 'Successfully joined the workspace!');
+        return redirect()->route('home')->withErrors(['error' => $result->getMessage()]);
     }
 
     /**
@@ -102,41 +79,9 @@ class WorkspaceInvitationController extends Controller
      */
     public function acceptInvitationByToken(string $token, User $user): bool
     {
-        $invitation = WorkspaceInvitation::where('token', $token)->first();
+        $invitationService = app(WorkspaceInvitationService::class);
+        $result = $invitationService->acceptInvitationByToken($token, $user);
 
-        if (! $invitation || ! $invitation->isValid()) {
-            return false;
-        }
-
-        // Check if the invitation email matches the user
-        if ($user->email !== $invitation->email) {
-            return false;
-        }
-
-        // Check if user is already a member
-        $existingMembership = WorkspaceMembership::where('workspace_id', $invitation->workspace_id)
-            ->where('user_id', $user->id)
-            ->exists();
-
-        if ($existingMembership) {
-            return false;
-        }
-
-        // Create membership
-        WorkspaceMembership::create([
-            'workspace_id' => $invitation->workspace_id,
-            'user_id' => $user->id,
-            'role' => $invitation->role,
-        ]);
-
-        // Set as current workspace if user doesn't have one
-        if (! $user->current_workspace_id) {
-            $user->update(['current_workspace_id' => $invitation->workspace_id]);
-        }
-
-        // Mark invitation as accepted
-        $invitation->markAsAccepted();
-
-        return true;
+        return $result->wasSuccessful();
     }
 }
