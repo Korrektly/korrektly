@@ -14,18 +14,21 @@ type LoginForm = {
     email: string;
     password: string;
     remember: boolean;
+    invitation?: string;
 };
 
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
+    invitation?: string;
 }
 
-export default function Login({ status, canResetPassword }: LoginProps) {
+export default function Login({ status, canResetPassword, invitation }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
         email: "",
         password: "",
         remember: false,
+        invitation: invitation || "",
     });
 
     const submit: FormEventHandler = (e) => {
@@ -92,13 +95,13 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                     <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Log in
+                        {invitation ? "Log in & Join Workspace" : "Log in"}
                     </Button>
                 </div>
 
                 <div className="text-center text-sm text-muted-foreground">
                     Don't have an account?{" "}
-                    <TextLink href={route("register")} tabIndex={5}>
+                    <TextLink href={route("register", invitation ? { invitation } : {})} tabIndex={5}>
                         Sign up
                     </TextLink>
                 </div>

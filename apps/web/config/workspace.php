@@ -1,17 +1,34 @@
 <?php
 
 return [
-    'enabled' => env('WORKSPACE_ENABLED', false),
+    'enabled' => env('WORKSPACE_ENABLED', true),
 
     'roles' => [
         'owner' => [
-            'permissions' => ['*'],
+            'permissions' => [
+                'workspace.manage',
+                'workspace.invite',
+                'members.manage',
+                'apps.manage',
+                'installations.view',
+                '*',
+            ],
         ],
         'admin' => [
-            'permissions' => ['*'],
+            'permissions' => [
+                'workspace.invite',
+                'members.manage',
+                'apps.manage',
+                'installations.view',
+                '*',
+            ],
         ],
         'member' => [
-            'permissions' => ['*'],
+            'permissions' => [
+                'apps.view',
+                'installations.view',
+                '*',
+            ],
         ],
     ],
 ];

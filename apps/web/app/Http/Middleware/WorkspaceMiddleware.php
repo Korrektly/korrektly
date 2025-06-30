@@ -2,10 +2,14 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Workspace;
+use App\Models\WorkspaceMembership;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Context;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class WorkspaceMiddleware
@@ -21,19 +25,9 @@ class WorkspaceMiddleware
             /** @var \App\Models\User $user */
             $user = Auth::user();
 
-            // Check if we're switching workspaces
-            if (config('workspace.enabled') && $request->has('switch_workspace') && $request->input('switch_workspace')) {
-                $workspaceId = $request->input('switch_workspace');
-
-                // Verify user belongs to this workspace
-                $workspaceBelongsToUser = $user->workspaceMemberships()
-                    ->where('workspace_memberships.workspace_id', $workspaceId)
-                    ->exists();
-
-                if ($workspaceBelongsToUser) {
-                    $user->current_workspace_id = $workspaceId;
-                    $user->save();
-                }
+            // Auto-create workspace for users without one
+            if (! $user->current_workspace_id || ! $user->workspaceMemberships()->exists()) {
+                $this->ensureUserHasWorkspace($user);
             }
 
             // Set the current workspace context if user has a current workspace
@@ -43,5 +37,40 @@ class WorkspaceMiddleware
         }
 
         return $next($request);
+    }
+
+    /**
+     * Ensure user has a workspace, create one if needed
+     */
+    private function ensureUserHasWorkspace($user): void
+    {
+        DB::transaction(function () use ($user) {
+            // Check if user has any workspace memberships
+            $existingMembership = $user->workspaceMemberships()->first();
+
+            if ($existingMembership) {
+                // User has memberships but no current workspace set
+                $user->update(['current_workspace_id' => $existingMembership->workspace_id]);
+
+                return;
+            }
+
+            // User has no workspace memberships, create a new workspace
+            $workspace = Workspace::create([
+                'name' => "{$user->name}'s Workspace",
+                'slug' => Str::slug("{$user->name} Workspace").'-'.Str::random(5),
+                'owner_id' => $user->id,
+            ]);
+
+            // Create owner membership
+            WorkspaceMembership::create([
+                'workspace_id' => $workspace->id,
+                'user_id' => $user->id,
+                'role' => 'owner',
+            ]);
+
+            // Set as current workspace
+            $user->update(['current_workspace_id' => $workspace->id]);
+        });
     }
 }

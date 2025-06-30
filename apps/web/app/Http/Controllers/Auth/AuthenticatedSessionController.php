@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\WorkspaceInvitationController;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ class AuthenticatedSessionController extends Controller
         return Inertia::render('auth/login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),
+            'invitation' => $request->query('invitation'),
         ]);
     }
 
@@ -35,7 +37,24 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
-        // Set current workspace to the first workspace membership if available
+        // Handle workspace invitation if present
+        $invitationToken = $request->input('invitation');
+        if ($invitationToken) {
+            $invitationController = new WorkspaceInvitationController;
+            $accepted = $invitationController->acceptInvitationByToken($invitationToken, $user);
+
+            if ($accepted) {
+                return redirect()->intended(route('dashboard', absolute: false))
+                    ->with('success', 'Successfully joined the workspace!');
+            } else {
+                // If invitation acceptance fails, still proceed with normal login
+                // but show a warning message
+                return redirect()->intended(route('dashboard', absolute: false))
+                    ->with('warning', 'Could not join workspace. The invitation may be invalid or expired.');
+            }
+        }
+
+        // Set current workspace to the first workspace membership if available (normal login flow)
         $firstMembership = $user->workspaceMemberships()->first();
         if ($firstMembership) {
             $user->current_workspace_id = $firstMembership->workspace_id;
