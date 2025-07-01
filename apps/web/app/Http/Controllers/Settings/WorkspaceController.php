@@ -20,9 +20,37 @@ class WorkspaceController extends Controller
     use AuthorizesRequests;
 
     /**
-     * Show the workspace settings page
+     * Show the workspace overview page
      */
-    public function show(Request $request): Response
+    public function showOverview(Request $request): Response
+    {
+        $user = $request->user();
+        $workspace = $user->currentWorkspace;
+
+        if (! $workspace) {
+            abort(404, 'No current workspace found');
+        }
+
+        // Check if user can manage workspace
+        $membership = $user->getMembershipForWorkspace($workspace->id);
+        $canManage = $membership && in_array($membership->role, ['owner', 'admin']);
+
+        return Inertia::render('settings/workspace/overview', [
+            'workspace' => [
+                'id' => $workspace->id,
+                'name' => $workspace->name,
+                'slug' => $workspace->slug,
+                'logo' => $workspace->logo,
+                'owner_id' => $workspace->owner_id,
+            ],
+            'canManage' => $canManage,
+        ]);
+    }
+
+    /**
+     * Show the workspace members page
+     */
+    public function showMembers(Request $request): Response
     {
         $user = $request->user();
         $workspace = $user->currentWorkspace;
@@ -68,17 +96,9 @@ class WorkspaceController extends Controller
                 ];
             });
 
-        return Inertia::render('settings/workspace', [
-            'workspace' => [
-                'id' => $workspace->id,
-                'name' => $workspace->name,
-                'slug' => $workspace->slug,
-                'logo' => $workspace->logo,
-                'owner_id' => $workspace->owner_id,
-            ],
+        return Inertia::render('settings/workspace/members', [
             'members' => $members,
             'pendingInvitations' => $pendingInvitations,
-            'currentUserRole' => $membership->role,
             'canManage' => $canManage,
             'availableRoles' => ['member', 'admin'],
         ]);

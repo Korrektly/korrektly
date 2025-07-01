@@ -21,7 +21,8 @@ Route::middleware('auth')->group(function () {
     })->name('appearance');
 
     // Workspace settings routes
-    Route::get('settings/workspace', [WorkspaceController::class, 'show'])->name('settings.workspace');
+    Route::get('settings/workspace', [WorkspaceController::class, 'showOverview'])->name('settings.workspace');
+    Route::get('settings/workspace/members', [WorkspaceController::class, 'showMembers'])->name('settings.workspace.members');
     Route::patch('settings/workspace', [WorkspaceController::class, 'update'])->name('settings.workspace.update');
     Route::post('settings/workspace/invite', [WorkspaceController::class, 'inviteUser'])->name('settings.workspace.invite');
     Route::patch('settings/workspace/members/{membership}', [WorkspaceController::class, 'updateMemberRole'])->name('settings.workspace.members.update');
