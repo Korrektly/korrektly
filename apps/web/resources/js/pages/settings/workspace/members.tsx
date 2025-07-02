@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import HeadingSmall from "@/components/heading-small";
 import InputError from "@/components/input-error";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -237,7 +238,10 @@ export default function WorkspaceMembers({ members, pendingInvitations, canManag
                                         <TableRow key={member.id}>
                                             <TableCell>
                                                 <div className="flex items-center space-x-2">
-                                                    <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full" />
+                                                    <Avatar>
+                                                        <AvatarImage src={member.avatar} alt={member.name} />
+                                                        <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                                                    </Avatar>
                                                     <div>
                                                         <p className="font-medium">{member.name}</p>
                                                         <p className="text-sm text-muted-foreground">{member.email}</p>

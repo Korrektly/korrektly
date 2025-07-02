@@ -25,7 +25,6 @@ return new class extends Migration
             $table->foreign('role')->references('name')->on('roles');
             $table->index(['email', 'workspace_id']);
             $table->index(['token']);
-            $table->unique(['email', 'workspace_id'], 'unique_email_workspace');
         });
     }
 
