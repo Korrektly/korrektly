@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\App;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AppController extends Controller
 {
@@ -31,11 +32,38 @@ class AppController extends Controller
         ]);
     }
 
-    public function showDetails(App $app)
+    /**
+     * Show the app overview page (main tab)
+     */
+    public function showOverview(App $app)
     {
         $this->authorize('view', $app);
 
-        return \Inertia\Inertia::render('apps/app', [
+        return Inertia::render('apps/overview', [
+            'app' => $app,
+        ]);
+    }
+
+    /**
+     * Show the app installations page
+     */
+    public function showInstallations(App $app)
+    {
+        $this->authorize('view', $app);
+
+        return Inertia::render('apps/installations', [
+            'app' => $app,
+        ]);
+    }
+
+    /**
+     * Show the app integration page
+     */
+    public function showIntegration(App $app)
+    {
+        $this->authorize('view', $app);
+
+        return Inertia::render('apps/integration', [
             'app' => $app,
         ]);
     }

@@ -1,24 +1,22 @@
-import { useState, useEffect } from "react";
-import AppLayout from "@/layouts/app-layout";
-import { Head } from "@inertiajs/react";
-import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import axios from "axios";
-import { toast } from "sonner";
-import type { App, Installation, AggregationData, InstallationListResponse, InstallationAggregateResponse, GrowthMetrics } from "@/types/apps";
+import { Button } from "@/components/ui/button";
+import AppDetailsLayout from "@/layouts/app-details-layout";
+import AppLayout from "@/layouts/app-layout";
 import type { BreadcrumbItem } from "@/types";
+import type { AggregationData, App, GrowthMetrics, Installation, InstallationAggregateResponse, InstallationListResponse } from "@/types/apps";
+import { Head } from "@inertiajs/react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-// Import the new modular components
-import AppHeader from "@/components/apps/app-header";
-import AppStats from "@/components/apps/app-stats";
 import AppChart from "@/components/apps/app-chart";
-import AppInstallationsTable from "@/components/apps/app-installations-table";
+import AppStats from "@/components/apps/app-stats";
 
-interface AppDetailsProps {
+interface AppOverviewProps {
     app: App;
 }
 
-export default function AppDetails({ app }: AppDetailsProps) {
+export default function AppOverview({ app }: AppOverviewProps) {
     const [installations, setInstallations] = useState<Installation[]>([]);
     const [aggregations, setAggregations] = useState<AggregationData[]>([]);
     const [loading, setLoading] = useState(true);
@@ -124,7 +122,7 @@ export default function AppDetails({ app }: AppDetailsProps) {
     if (error) {
         return (
             <AppLayout breadcrumbs={breadcrumbs}>
-                <Head title={`${app.name} - App Details`} />
+                <Head title={`${app.name} - Overview`} />
                 <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                     <Alert variant="destructive" className="mx-auto max-w-2xl">
                         <AlertDescription className="flex items-center justify-between">
@@ -141,27 +139,23 @@ export default function AppDetails({ app }: AppDetailsProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`${app.name} - App Details`} />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-8 py-6">
-                {/* App Header */}
-                <AppHeader app={app} dateRange={dateRange} onDateRangeChange={setDateRange} />
+            <Head title={`${app.name} - Overview`} />
+            <AppDetailsLayout app={app} dateRange={dateRange} onDateRangeChange={setDateRange} activeTab="overview">
+                <div className="space-y-6">
+                    {/* App Statistics */}
+                    <AppStats
+                        app={app}
+                        dateRange={dateRange}
+                        totalInstallations={totalCount}
+                        activeInstallations={getActiveInstallations()}
+                        growth={growth}
+                        loading={loading}
+                    />
 
-                {/* App Statistics */}
-                <AppStats
-                    app={app}
-                    dateRange={dateRange}
-                    totalInstallations={totalCount}
-                    activeInstallations={getActiveInstallations()}
-                    growth={growth}
-                    loading={loading}
-                />
-
-                {/* App Chart */}
-                <AppChart app={app} dateRange={dateRange} aggregations={aggregations} loading={loading} />
-
-                {/* Installation Logs Table */}
-                <AppInstallationsTable installations={installations} loading={loading} />
-            </div>
+                    {/* App Chart */}
+                    <AppChart app={app} dateRange={dateRange} aggregations={aggregations} loading={loading} />
+                </div>
+            </AppDetailsLayout>
         </AppLayout>
     );
 }

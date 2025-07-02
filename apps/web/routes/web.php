@@ -18,7 +18,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::get('/apps/{app}', [AppController::class, 'showDetails'])->name('apps.show');
+    // App detail routes (organized like settings)
+    Route::get('/apps/{app}', [AppController::class, 'showOverview'])->name('apps.show');
+    Route::get('/apps/{app}/installations', [AppController::class, 'showInstallations'])->name('apps.installations');
+    Route::get('/apps/{app}/integration', [AppController::class, 'showIntegration'])->name('apps.integration');
 
     // Workspace switching
     Route::post('/workspace/switch', [WorkspaceSwitchController::class, 'switch'])->name('workspace.switch');

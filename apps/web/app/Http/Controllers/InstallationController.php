@@ -25,6 +25,8 @@ class InstallationController extends Controller
             'end_date' => 'sometimes|date',
             'timezone' => 'sometimes|string',
             'group_by' => 'sometimes|in:hour,day,week,month',
+            'page' => 'sometimes|integer|min:1',
+            'per_page' => 'sometimes|integer|min:1|max:100',
         ]);
 
         $mode = $payload['mode'] ?? 'list';
@@ -96,20 +98,37 @@ class InstallationController extends Controller
             $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
-        $installations = $query->with('app')->orderBy('created_at', 'desc')->get();
+        // Pagination parameters
+        $perPage = $payload['per_page'] ?? 15;
+        $currentPage = $payload['page'] ?? 1;
+
+        // Get paginated results
+        $paginatedInstallations = $query->with('app')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $currentPage);
+
+        // For growth calculations, we need all installations (not paginated)
+        $allInstallations = $query->with('app')->orderBy('created_at', 'desc')->get();
 
         // Calculate growth metrics
-        $growth = $this->calculatePeriodGrowth($installations, $payload, $timezone, $request);
+        $growth = $this->calculatePeriodGrowth($allInstallations, $payload, $timezone, $request);
 
         // Calculate most adopted version
-        $mostAdoptedVersion = $this->calculateMostAdoptedVersion($installations);
+        $mostAdoptedVersion = $this->calculateMostAdoptedVersion($allInstallations);
         $growth['most_adopted_version'] = $mostAdoptedVersion;
 
         return response()->json([
-            'installations' => $installations,
+            'installations' => $paginatedInstallations->items(),
             'meta' => [
-                'total_count' => $installations->count(),
+                'current_page' => $paginatedInstallations->currentPage(),
+                'last_page' => $paginatedInstallations->lastPage(),
+                'per_page' => $paginatedInstallations->perPage(),
+                'total' => $paginatedInstallations->total(),
+                'from' => $paginatedInstallations->firstItem(),
+                'to' => $paginatedInstallations->lastItem(),
+                'has_more_pages' => $paginatedInstallations->hasMorePages(),
                 'timezone' => $timezone,
+                'total_count' => $allInstallations->count(), // Keep for backward compatibility
             ],
             'growth' => $growth,
         ]);
