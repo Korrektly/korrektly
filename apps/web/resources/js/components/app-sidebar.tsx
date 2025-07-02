@@ -2,12 +2,12 @@ import { NavFooter } from "@/components/nav-footer";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { SharedData, type NavItem } from "@/types";
+import { type NavItem, SharedData } from "@/types";
 import { Link, usePage } from "@inertiajs/react";
-import { BookOpen, Folder, LayoutGrid } from "lucide-react";
+import { BookOpen, Folder, LayoutGrid, Settings } from "lucide-react";
 import AppLogo from "./app-logo";
-import { WorkspaceSelector } from "./workspace-selector";
 import { NavApps } from "./nav-apps";
+import { WorkspaceSelector } from "./workspace-selector";
 
 const mainNavItems: NavItem[] = [
     {
@@ -18,6 +18,11 @@ const mainNavItems: NavItem[] = [
 ];
 
 const footerNavItems: NavItem[] = [
+    {
+        title: "Workspace Settings",
+        href: "/settings/workspace",
+        icon: Settings,
+    },
     {
         title: "Repository",
         href: "https://github.com/laravel/react-starter-kit",

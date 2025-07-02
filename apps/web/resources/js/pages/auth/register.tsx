@@ -13,21 +13,25 @@ type RegisterForm = {
     name: string;
     email: string;
     password: string;
-    password_confirmation: string;
+    invitation?: string;
 };
 
-export default function Register() {
+interface RegisterProps {
+    invitation?: string;
+}
+
+export default function Register({ invitation }: RegisterProps) {
     const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>({
         name: "",
         email: "",
         password: "",
-        password_confirmation: "",
+        invitation: invitation || "",
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route("register"), {
-            onFinish: () => reset("password", "password_confirmation"),
+            onFinish: () => reset("password"),
         });
     };
 
@@ -85,31 +89,15 @@ export default function Register() {
                         <InputError message={errors.password} />
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Confirm password</Label>
-                        <Input
-                            id="password_confirmation"
-                            type="password"
-                            required
-                            tabIndex={4}
-                            autoComplete="new-password"
-                            value={data.password_confirmation}
-                            onChange={(e) => setData("password_confirmation", e.target.value)}
-                            disabled={processing}
-                            placeholder="Confirm password"
-                        />
-                        <InputError message={errors.password_confirmation} />
-                    </div>
-
                     <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Create account
+                        {invitation ? "Create Account & Join Workspace" : "Create account"}
                     </Button>
                 </div>
 
                 <div className="text-center text-sm text-muted-foreground">
                     Already have an account?{" "}
-                    <TextLink href={route("login")} tabIndex={6}>
+                    <TextLink href={route("login", invitation ? { invitation } : {})} tabIndex={6}>
                         Log in
                     </TextLink>
                 </div>

@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('workspaces', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('owner_id')->constrained('users', 'id');
+            $table->foreignUuid('owner_id')->constrained('users', 'id')->cascadeOnDelete();
             $table->string('name');
             $table->string('slug')->unique();
             $table->longText('logo')->nullable();

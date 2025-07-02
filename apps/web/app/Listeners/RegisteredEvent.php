@@ -27,9 +27,21 @@ class RegisteredEvent
         $user = $event->user;
 
         DB::transaction(function () use ($user) {
+            $maxRetries = 10;
+            $attempts = 0;
+
+            // Generate unique slug
+            do {
+                if ($attempts >= $maxRetries) {
+                    throw new \Exception('Unable to generate unique workspace slug after maximum attempts');
+                }
+                $slug = Str::slug("{$user->name} Workspace").'-'.Str::random(5);
+                $attempts++;
+            } while (Workspace::where('slug', $slug)->exists());
+
             $workspace = Workspace::create([
                 'name' => "{$user->name}'s Workspace",
-                'slug' => Str::slug("{$user->name} Workspace").Str::random(5),
+                'slug' => $slug,
                 'owner_id' => $user->id,
             ]);
 

@@ -9,23 +9,23 @@ A lightweight TypeScript/JavaScript SDK for tracking application installations a
 
 ```bash
 # Using npm
-npm install @korrektly/sdk-ts
+npm install @korrektly/sdk
 
 # Using yarn
-yarn add @korrektly/sdk-ts
+yarn add @korrektly/sdk
 
 # Using pnpm
-pnpm add @korrektly/sdk-ts
+pnpm add @korrektly/sdk
 
 # Using bun
-bun add @korrektly/sdk-ts
+bun add @korrektly/sdk
 ```
 
 <a id="quick-start"></a>
 ## Quick Start
 
 ```typescript
-import { KorrektlyClient } from '@korrektly/sdk-ts';
+import { KorrektlyClient } from '@korrektly/sdk';
 
 // Initialize the client
 const korrektly = new KorrektlyClient({
@@ -59,7 +59,7 @@ const korrektly = new KorrektlyClient({
 ### Basic Usage
 
 ```typescript
-import { KorrektlyClient } from '@korrektly/sdk-ts';
+import { KorrektlyClient } from '@korrektly/sdk';
 
 const korrektly = new KorrektlyClient({
   appId: 'my-awesome-app',
@@ -71,7 +71,7 @@ const korrektly = new KorrektlyClient({
 ### With Version Tracking
 
 ```typescript
-import { KorrektlyClient } from '@korrektly/sdk-ts';
+import { KorrektlyClient } from '@korrektly/sdk';
 
 const korrektly = new KorrektlyClient({
   appId: 'my-awesome-app',
@@ -84,7 +84,7 @@ const korrektly = new KorrektlyClient({
 ### Development Environment
 
 ```typescript
-import { KorrektlyClient } from '@korrektly/sdk-ts';
+import { KorrektlyClient } from '@korrektly/sdk';
 
 const korrektly = new KorrektlyClient({
   appId: 'my-awesome-app',
@@ -99,7 +99,7 @@ const korrektly = new KorrektlyClient({
 ### Electron App Example
 
 ```typescript
-import { KorrektlyClient } from '@korrektly/sdk-ts';
+import { KorrektlyClient } from '@korrektly/sdk';
 import { machineId } from 'node-machine-id';
 
 // Use machine ID as instance identifier for desktop apps
@@ -116,7 +116,7 @@ const korrektly = new KorrektlyClient({
 ### Browser Extension Example
 
 ```typescript
-import { KorrektlyClient } from '@korrektly/sdk-ts';
+import { KorrektlyClient } from '@korrektly/sdk';
 
 // Generate or retrieve a unique installation ID
 const getOrCreateInstanceId = () => {
@@ -144,7 +144,7 @@ Since the `instanceId` needs to remain consistent across app restarts, here are 
 ### File-Based Storage (Node.js)
 
 ```typescript
-import { KorrektlyClient } from '@korrektly/sdk-ts';
+import { KorrektlyClient } from '@korrektly/sdk';
 import fs from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
@@ -184,7 +184,7 @@ const korrektly = new KorrektlyClient({
 ### SQLite with Bun
 
 ```typescript
-import { KorrektlyClient } from '@korrektly/sdk-ts';
+import { KorrektlyClient } from '@korrektly/sdk';
 import { Database } from 'bun:sqlite';
 import { randomUUID } from 'crypto';
 
@@ -228,7 +228,7 @@ const korrektly = new KorrektlyClient({
 ### Prisma Example
 
 ```typescript
-import { KorrektlyClient } from '@korrektly/sdk-ts';
+import { KorrektlyClient } from '@korrektly/sdk';
 import { PrismaClient } from '@prisma/client';
 import { randomUUID } from 'crypto';
 
@@ -275,7 +275,7 @@ const korrektly = new KorrektlyClient({
 ### Drizzle ORM with PostgreSQL
 
 ```typescript
-import { KorrektlyClient } from '@korrektly/sdk-ts';
+import { KorrektlyClient } from '@korrektly/sdk';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { pgTable, text } from 'drizzle-orm/pg-core';
 import { eq } from 'drizzle-orm';
@@ -326,7 +326,7 @@ const korrektly = new KorrektlyClient({
 ### Neon Database Example
 
 ```typescript
-import { KorrektlyClient } from '@korrektly/sdk-ts';
+import { KorrektlyClient } from '@korrektly/sdk';
 import { neon } from '@neondatabase/serverless';
 import { randomUUID } from 'crypto';
 
@@ -372,7 +372,7 @@ const korrektly = new KorrektlyClient({
 ### Turso Example
 
 ```typescript
-import { KorrektlyClient } from '@korrektly/sdk-ts';
+import { KorrektlyClient } from '@korrektly/sdk';
 import { createClient } from '@libsql/client';
 import { randomUUID } from 'crypto';
 
@@ -423,7 +423,7 @@ const korrektly = new KorrektlyClient({
 ### Vercel KV Example
 
 ```typescript
-import { KorrektlyClient } from '@korrektly/sdk-ts';
+import { KorrektlyClient } from '@korrektly/sdk';
 import { kv } from '@vercel/kv';
 import { randomUUID } from 'crypto';
 
@@ -521,6 +521,11 @@ const korrektly = new KorrektlyClient({
   disabled: process.env.NODE_ENV === 'development'
 });
 ```
+
+<a id="changelog"></a>
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for the latest updates.
 
 <a id="contributing"></a>
 ## Contributing
