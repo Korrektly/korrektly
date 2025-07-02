@@ -42,11 +42,18 @@ class WorkspaceInvitation extends Model
      */
     public static function generateToken(): string
     {
-        do {
-            $token = Str::random(64);
-        } while (static::where('token', $token)->exists());
+        $maxAttempts = 5;
+        $attempts = 0;
 
-        return $token;
+        while ($attempts < $maxAttempts) {
+            $token = Str::random(64);
+            if (! static::where('token', $token)->exists()) {
+                return $token;
+            }
+            $attempts++;
+        }
+
+        throw new \RuntimeException('Unable to generate unique token after '.$maxAttempts.' attempts');
     }
 
     /**
@@ -54,7 +61,7 @@ class WorkspaceInvitation extends Model
      */
     public function isExpired(): bool
     {
-        return $this->expires_at->isPast();
+        return $this->expires_at && $this->expires_at->isPast();
     }
 
     /**

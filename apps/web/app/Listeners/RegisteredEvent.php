@@ -27,9 +27,14 @@ class RegisteredEvent
         $user = $event->user;
 
         DB::transaction(function () use ($user) {
+            // Generate unique slug
+            do {
+                $slug = Str::slug("{$user->name} Workspace").'-'.Str::random(5);
+            } while (Workspace::where('slug', $slug)->exists());
+
             $workspace = Workspace::create([
                 'name' => "{$user->name}'s Workspace",
-                'slug' => Str::slug("{$user->name} Workspace").Str::random(5),
+                'slug' => $slug,
                 'owner_id' => $user->id,
             ]);
 

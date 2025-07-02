@@ -43,15 +43,14 @@ class AuthenticatedSessionController extends Controller
             $invitationService = app(WorkspaceInvitationService::class);
             $result = $invitationService->acceptInvitationByToken($invitationToken, $user);
 
-            if ($result->wasSuccessful()) {
-                return redirect()->intended(route('dashboard', absolute: false))
-                    ->with('success', 'Successfully joined the workspace!');
-            } else {
-                // If invitation acceptance fails, still proceed with normal login
-                // but show a warning message
-                return redirect()->intended(route('dashboard', absolute: false))
-                    ->with('warning', 'Could not join workspace. The invitation may be invalid or expired.');
-            }
+            $message = $result->wasSuccessful()
+                ? 'Successfully joined the workspace!'
+                : 'Could not join workspace. The invitation may be invalid or expired.';
+
+            $messageType = $result->wasSuccessful() ? 'success' : 'warning';
+
+            return redirect()->intended(route('dashboard', absolute: false))
+                ->with($messageType, $message);
         }
 
         // Set current workspace to the first workspace membership if available (normal login flow)

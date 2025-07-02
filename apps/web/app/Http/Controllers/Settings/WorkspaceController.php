@@ -11,6 +11,7 @@ use App\Notifications\WorkspaceInvitationNotification;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -149,6 +150,13 @@ class WorkspaceController extends Controller
             abort(403, 'Insufficient permissions to invite users');
         }
 
+        // Check member limit
+        $currentCount = $workspace->members()->count();
+        $limit = config('workspace.member_limit');
+        if ($limit !== null && $currentCount >= $limit) {
+            abort(403, 'Workspace member limit reached.');
+        }
+
         $validated = $request->validate([
             'email' => [
                 'required',
@@ -264,20 +272,22 @@ class WorkspaceController extends Controller
             return back()->withErrors(['error' => 'You cannot remove yourself from the workspace']);
         }
 
-        // Remove the member
-        $memberUser = $membership->user;
-        $membership->delete();
+        return DB::transaction(function () use ($membership, $workspace) {
+            // Remove the member
+            $memberUser = $membership->user;
+            $membership->delete();
 
-        // If the removed user had this as their current workspace, clear it
-        if ($memberUser->current_workspace_id === $workspace->id) {
-            // Try to set another workspace as current
-            $anotherMembership = $memberUser->workspaceMemberships()->first();
-            $memberUser->update([
-                'current_workspace_id' => $anotherMembership ? $anotherMembership->workspace_id : null,
-            ]);
-        }
+            // If the removed user had this as their current workspace, clear it
+            if ($memberUser->current_workspace_id === $workspace->id) {
+                // Try to set another workspace as current
+                $anotherMembership = $memberUser->workspaceMemberships()->first();
+                $memberUser->update([
+                    'current_workspace_id' => $anotherMembership ? $anotherMembership->workspace_id : null,
+                ]);
+            }
 
-        return back()->with('success', 'Member removed successfully');
+            return back()->with('success', 'Member removed successfully');
+        });
     }
 
     /**

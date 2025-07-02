@@ -11,7 +11,7 @@ Route::get('/', function () {
 })->name('home');
 
 // Workspace invitation routes (public access)
-Route::get('invitation/{token}', [WorkspaceInvitationController::class, 'show'])->name('workspace.invitation.accept');
+Route::get('invitation/{token}', [WorkspaceInvitationController::class, 'show'])->middleware('throttle:5,1')->name('workspace.invitation.accept');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

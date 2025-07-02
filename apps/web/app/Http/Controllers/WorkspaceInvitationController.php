@@ -77,11 +77,10 @@ class WorkspaceInvitationController extends Controller
     /**
      * Accept invitation by token (called from auth controllers)
      */
-    public function acceptInvitationByToken(string $token, User $user): bool
+    public function acceptInvitationByToken(string $token, User $user): \App\Dto\InvitationAcceptanceResult
     {
         $invitationService = app(WorkspaceInvitationService::class);
-        $result = $invitationService->acceptInvitationByToken($token, $user);
 
-        return $result->wasSuccessful();
+        return $invitationService->acceptInvitationByToken($token, $user);
     }
 }

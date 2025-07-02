@@ -80,6 +80,7 @@ const getRoleBadgeVariant = (role: string) => {
 
 export default function WorkspaceMembers({ members, pendingInvitations, canManage, availableRoles }: Props) {
     const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+    const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; memberId: string; memberName: string } | null>(null);
 
     // Invitation form
     const inviteForm = useForm({
@@ -119,14 +120,20 @@ export default function WorkspaceMembers({ members, pendingInvitations, canManag
     };
 
     const handleRemoveMember = (memberId: string, memberName: string) => {
-        if (confirm(`Are you sure you want to remove ${memberName} from the workspace?`)) {
-            router.delete(route("settings.workspace.members.remove", { membership: memberId }), {
+        setConfirmDialog({ isOpen: true, memberId, memberName });
+    };
+
+    const confirmRemoveMember = () => {
+        if (confirmDialog) {
+            router.delete(route("settings.workspace.members.remove", { membership: confirmDialog.memberId }), {
                 preserveScroll: true,
                 onSuccess: () => {
                     toast.success("Member removed successfully");
+                    setConfirmDialog(null);
                 },
                 onError: () => {
                     toast.error("Failed to remove member");
+                    setConfirmDialog(null);
                 },
             });
         }
@@ -340,6 +347,28 @@ export default function WorkspaceMembers({ members, pendingInvitations, canManag
                     </div>
                 </div>
             </WorkspaceSettingsLayout>
+
+            {/* Confirmation Dialog */}
+            {confirmDialog && (
+                <Dialog open={confirmDialog.isOpen} onOpenChange={(open) => !open && setConfirmDialog(null)}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Remove Member</DialogTitle>
+                            <DialogDescription>
+                                Are you sure you want to remove {confirmDialog.memberName} from the workspace? This action cannot be undone.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setConfirmDialog(null)}>
+                                Cancel
+                            </Button>
+                            <Button type="button" variant="destructive" onClick={confirmRemoveMember}>
+                                Remove Member
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            )}
         </AppLayout>
     );
 }

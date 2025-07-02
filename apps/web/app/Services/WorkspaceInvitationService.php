@@ -60,6 +60,20 @@ class WorkspaceInvitationService
             );
         }
 
+        $this->createMembershipAndFinalize($invitation, $user);
+
+        return new InvitationAcceptanceResult(
+            success: true,
+            message: 'Successfully joined the workspace!',
+            type: 'success'
+        );
+    }
+
+    /**
+     * Create workspace membership and finalize invitation acceptance
+     */
+    private function createMembershipAndFinalize(WorkspaceInvitation $invitation, User $user): void
+    {
         // Create membership
         WorkspaceMembership::create([
             'workspace_id' => $invitation->workspace_id,
@@ -74,12 +88,6 @@ class WorkspaceInvitationService
 
         // Mark invitation as accepted
         $invitation->markAsAccepted();
-
-        return new InvitationAcceptanceResult(
-            success: true,
-            message: 'Successfully joined the workspace!',
-            type: 'success'
-        );
     }
 
     /**
@@ -145,20 +153,7 @@ class WorkspaceInvitationService
             );
         }
 
-        // Create membership
-        WorkspaceMembership::create([
-            'workspace_id' => $invitation->workspace_id,
-            'user_id' => $user->id,
-            'role' => $invitation->role,
-        ]);
-
-        // Set as current workspace if user doesn't have one
-        if (! $user->current_workspace_id) {
-            $user->update(['current_workspace_id' => $invitation->workspace_id]);
-        }
-
-        // Mark invitation as accepted
-        $invitation->markAsAccepted();
+        $this->createMembershipAndFinalize($invitation, $user);
 
         return new InvitationAcceptanceResult(
             success: true,

@@ -3,6 +3,9 @@
 return [
     'enabled' => env('WORKSPACE_ENABLED', true),
 
+    // maximum number of members allowed per workspace (null = unlimited)
+    'member_limit' => env('WORKSPACE_MEMBER_LIMIT', null),
+
     'roles' => [
         'owner' => [
             'permissions' => [
