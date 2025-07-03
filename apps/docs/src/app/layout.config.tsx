@@ -1,4 +1,4 @@
-import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
+import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 
 /**
  * Shared layout configurations
@@ -8,13 +8,9 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
  * Docs Layout: app/docs/layout.tsx
  */
 export const baseOptions: BaseLayoutProps = {
-  nav: {
-    title: (
-      <>
-        Korrektly Documentation
-      </>
-    ),
-  },
-  // see https://fumadocs.dev/docs/ui/navigation/links
-  links: [],
+    nav: {
+        title: <>Korrektly Documentation</>,
+    },
+    // see https://fumadocs.dev/docs/ui/navigation/links
+    links: [],
 };

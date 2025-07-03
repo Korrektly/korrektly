@@ -123,4 +123,7 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    // Temporarily store waitlist emails in the database
+    'waitlist_emails' => array_filter(explode(',', env('WAITLIST_EMAILS', ''))),
+
 ];

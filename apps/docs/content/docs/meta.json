@@ -1,8 +1,5 @@
 {
     "title": "Korrektly Documentation",
-    "pages": [
-        "---Introduction---",
-        "./introduction/index"
-    ],
+    "pages": ["---Introduction---", "./introduction/index"],
     "defaultOpen": true
 }
