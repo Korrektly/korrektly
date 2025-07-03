@@ -451,6 +451,68 @@ const korrektly = new KorrektlyClient({
 });
 ```
 
+<a id="cloudflare-d1-example"></a>
+### Cloudflare D1 Example
+
+```typescript
+import { KorrektlyClient } from '@korrektly/sdk';
+import { randomUUID } from 'crypto';
+
+// Define environment interface for Cloudflare Worker
+export interface Env {
+  DB: D1Database;
+}
+
+const getOrCreateInstanceId = async (db: D1Database): Promise<string> => {
+  // Create table if it doesn't exist
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS app_config (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  `);
+  
+  // Try to get existing instance ID
+  const result = await db.prepare('SELECT value FROM app_config WHERE key = ?')
+    .bind('instance_id')
+    .first();
+  
+  if (result) {
+    return result.value as string;
+  }
+  
+  // Create new instance ID
+  const newInstanceId = randomUUID();
+  await db.prepare('INSERT INTO app_config (key, value) VALUES (?, ?)')
+    .bind('instance_id', newInstanceId)
+    .run();
+  
+  return newInstanceId;
+};
+
+// Usage in Cloudflare Worker
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const instanceId = await getOrCreateInstanceId(env.DB);
+    
+    const korrektly = new KorrektlyClient({
+      appId: 'my-cloudflare-worker-app',
+      instanceId,
+      appVersion: '1.0.0'
+    });
+    
+    // Your worker logic here
+    return new Response('Hello World!');
+  },
+};
+
+// wrangler.toml configuration example:
+// [[d1_databases]]
+// binding = "DB"
+// database_name = "my-app-db"
+// database_id = "your-database-id"
+```
+
 <a id="how-it-works"></a>
 ## How It Works
 
