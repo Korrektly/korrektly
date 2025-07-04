@@ -38,7 +38,7 @@ COPY package*.json bun.lock ./
 RUN bun i
 COPY . .
 
-ENV WORKSPACE_ENABLED=false
+ENV WORKSPACE_ENABLED=true
 
 RUN bun --bun run build
 
@@ -100,7 +100,7 @@ ENV PHP_OPCACHE_ENABLE=1 \
     APP_BASE_DIR=/var/www/html \
     NGINX_WEBROOT=/var/www/html/public \
     SSL_MODE=off \
-    WORKSPACE_ENABLED=false
+    WORKSPACE_ENABLED=true
 
 # Configure entrypoint
 COPY --chmod=755 docker/entrypoint.d/ /etc/entrypoint.d
@@ -126,8 +126,10 @@ RUN composer dump-autoload
 # Configure Nginx
 COPY docker/etc/nginx/conf.d/custom.conf /etc/nginx/conf.d/custom.conf
 COPY docker/etc/nginx/site-opts.d/http.conf /etc/nginx/site-opts.d/http.conf
+COPY --chmod=755 docker/etc/s6-overlay/ /etc/s6-overlay/
 
-RUN mkdir -p /etc/nginx/conf.d && \
+# Create nginx directories and set permissions
+RUN mkdir -p /etc/nginx/conf.d /etc/nginx/site-opts.d && \
     chown -R www-data:www-data /etc/nginx && \
     chmod -R 755 /etc/nginx
 

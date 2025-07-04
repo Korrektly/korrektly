@@ -6,5 +6,6 @@ cd /var/www/html
 foreground {
     php
     artisan
-    start:migration
+    queue:work
+    --tries=2
 }
