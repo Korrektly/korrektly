@@ -53,7 +53,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: docker/production/Dockerfile
+      dockerfile: docker/Dockerfile
       args:
         <<: *common-build-args
     restart: unless-stopped
