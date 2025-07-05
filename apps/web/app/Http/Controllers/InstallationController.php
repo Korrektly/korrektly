@@ -442,8 +442,6 @@ class InstallationController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
-        return response()->json([
-            'installation' => $installation->load('app'),
-        ], $installation->wasRecentlyCreated ? 201 : 200);
+        return response()->noContent()->setStatusCode($installation->wasRecentlyCreated ? 201 : 200);
     }
 }

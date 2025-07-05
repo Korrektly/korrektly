@@ -1,16 +1,25 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { SharedData } from "@/types";
+import { App, SharedData } from "@/types";
 import { Link, usePage } from "@inertiajs/react";
+import axios from "axios";
 import { PlusIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateAppModal from "./apps/create-app-modal";
 import { Button } from "./ui/button";
 
 export function NavApps() {
-    const { apps } = usePage<SharedData>().props;
+    const [apps, setApps] = useState<App[]>([]);
     const sidebar = useSidebar();
     const [createOpen, setCreateOpen] = useState(false);
+
+    useEffect(() => {
+        const fetchApps = async () => {
+            const res = await axios.get(route("api.apps.index"));
+            setApps(res.data.apps);
+        };
+        fetchApps();
+    }, []);
 
     return (
         <SidebarGroup className="px-2 py-0">

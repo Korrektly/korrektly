@@ -1,11 +1,12 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
-import { toast } from "sonner";
+import { router } from "@inertiajs/react";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface CreateAppModalProps {
     open: boolean;
@@ -42,7 +43,7 @@ export default function CreateAppModal({ open, onOpenChange, onAppCreated }: Cre
         setLoading(true);
 
         try {
-            await axios.post(route("api.apps.store"), {
+            const res = await axios.post(route("api.apps.store"), {
                 name: name.trim(),
                 url: url.trim() || null,
             });
@@ -56,6 +57,7 @@ export default function CreateAppModal({ open, onOpenChange, onAppCreated }: Cre
 
             // Notify parent and close modal
             onAppCreated();
+            router.visit(route("apps.show", res.data.app.id));
         } catch (error: unknown) {
             const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to create app";
 

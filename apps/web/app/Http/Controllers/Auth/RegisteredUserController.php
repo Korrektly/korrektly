@@ -54,22 +54,25 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         // Handle workspace invitation if present
+        $this->handleWorkspaceInvitation($request, $user);
+
+        return redirect()->route('dashboard');
+    }
+
+    private function handleWorkspaceInvitation(Request $request, User $user)
+    {
         $invitationToken = $request->input('invitation');
         if ($invitationToken) {
             $invitationService = app(WorkspaceInvitationService::class);
             $result = $invitationService->acceptInvitationByToken($invitationToken, $user);
 
             if ($result->wasSuccessful()) {
-                return redirect()->intended(route('dashboard', absolute: false))
+                return redirect()->route('dashboard')
                     ->with('success', 'Welcome! You have successfully joined the workspace.');
             } else {
-                // If invitation acceptance fails, still proceed with normal registration
-                // but show a warning message
-                return redirect()->intended(route('dashboard', absolute: false))
+                return redirect()->route('dashboard')
                     ->with('warning', 'Account created successfully, but could not join workspace. The invitation may be invalid or expired.');
             }
         }
-
-        return redirect()->intended(route('dashboard', absolute: false));
     }
 }

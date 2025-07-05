@@ -82,7 +82,9 @@ class AppController extends Controller
 
         $app = App::create($payload);
 
-        return redirect()->route('apps.show', $app);
+        return response()->json([
+            'app' => $app,
+        ]);
     }
 
     public function update(Request $request, App $app)
