@@ -17,6 +17,8 @@ class Installation extends Model
         'last_seen_at',
         'version',
         'ip_address',
+        'user_agent',
+        'url',
     ];
 
     protected $casts = [

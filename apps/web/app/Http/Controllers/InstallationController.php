@@ -7,7 +7,6 @@ use App\Models\Installation;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
 
 class InstallationController extends Controller
 {
@@ -429,26 +428,19 @@ class InstallationController extends Controller
             'app_id' => 'required|exists:apps,id',
             'identifier' => 'required|string|max:255',
             'version' => 'sometimes|string|max:255',
+            'url' => 'sometimes|string',
         ]);
-
-        $key = 'installations.'.$payload['app_id'].'.'.$payload['identifier'];
-
-        if (RateLimiter::tooManyAttempts($key, 10)) {
-            return response()->json([
-                'message' => 'Too many installations. Please try again later.',
-            ], 429);
-        }
 
         $installation = Installation::updateOrCreate([
             'app_id' => $payload['app_id'],
             'identifier' => $payload['identifier'],
         ], [
+            'url' => $payload['url'] ?? null,
             'last_seen_at' => now(),
             'version' => $payload['version'] ?? null,
-            'ip_address' => $payload['ip_address'] ?? null,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
         ]);
-
-        RateLimiter::hit($key);
 
         return response()->json([
             'installation' => $installation->load('app'),

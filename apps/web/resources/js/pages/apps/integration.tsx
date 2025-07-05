@@ -34,9 +34,9 @@ export default function AppIntegration({ app }: AppIntegrationProps) {
   -H "Content-Type: application/json" \\
   -d '{
     "app_id": "${app.id}",
-    "user_identifier": "user123",
-    "platform": "web",
-    "version": "1.0.0"
+    "identifier": "00000000-0000-0000-0000-000000000000",
+    "version": "1.0.0",
+    "url": "https://example.com"
   }'`;
 
     return (
@@ -116,15 +116,14 @@ export default function AppIntegration({ app }: AppIntegrationProps) {
                                             <code className="text-xs bg-muted px-1 py-0.5 rounded">app_id</code>: Your app's unique identifier
                                         </li>
                                         <li>
-                                            <code className="text-xs bg-muted px-1 py-0.5 rounded">user_identifier</code>: Unique identifier for the
-                                            user
-                                        </li>
-                                        <li>
-                                            <code className="text-xs bg-muted px-1 py-0.5 rounded">platform</code>: Platform where the app is
-                                            installed (web, mobile, desktop)
+                                            <code className="text-xs bg-muted px-1 py-0.5 rounded">identifier</code>: Unique identifier for the
+                                            installation
                                         </li>
                                         <li>
                                             <code className="text-xs bg-muted px-1 py-0.5 rounded">version</code>: Version of your app
+                                        </li>
+                                        <li>
+                                            <code className="text-xs bg-muted px-1 py-0.5 rounded">url</code>: URL of the installation
                                         </li>
                                     </ul>
                                 </div>

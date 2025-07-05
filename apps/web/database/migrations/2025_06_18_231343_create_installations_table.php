@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('installations', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('identifier')->unique()->index();
+            $table->longText('url')->nullable();
             $table->foreignUuid('app_id')->constrained('apps')->cascadeOnDelete();
             $table->timestamp('last_seen_at')->nullable();
             $table->string('version')->nullable();
             $table->string('ip_address')->nullable();
+            $table->longText('user_agent')->nullable();
             $table->timestamps();
         });
     }
