@@ -30,7 +30,7 @@ export default function AppIntegration({ app }: AppIntegrationProps) {
         }
     };
 
-    const exampleApiRequest = `curl -X POST "${window.location.origin}/api/installations" \\
+    const exampleApiRequest = `curl -X POST "${window.location.origin}/api/v1/installations" \\
   -H "Content-Type: application/json" \\
   -d '{
     "app_id": "${app.id}",
